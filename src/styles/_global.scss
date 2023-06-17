@@ -1,0 +1,517 @@
+@import "./_variables.scss";
+
+body {
+  margin: 0;
+  padding: 0;
+  font-size: $sizeFontBase;
+  line-height: 1.2 * $sizeFontBase;
+  font-family: "Open Sans", sans-serif;
+  overflow: hidden;
+}
+
+svg {
+  shape-rendering:geometricPrecision; 
+  text-rendering:geometricPrecision; 
+  image-rendering:optimizeQuality; 
+  fill-rule:evenodd; 
+  clip-rule:evenodd
+}
+
+div {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+#app {
+  > h1 {
+    font-size: 2 * $sizeFontBase;
+  }
+
+  > main {
+    position: fixed;
+    top: $sizeHeaderHeight;
+    left: 0;
+    right: 0;
+    bottom: $sizeFooterHeight;
+  }
+
+  > header {
+    position: static;
+    box-sizing: border-box;
+    top: 0;
+    left: 0;
+    padding: $paddingSmall;
+    width: 100%;
+    height: $sizeHeaderHeight;
+    background: $colorHeaderBg;
+  }
+
+  p {
+    margin: 0;
+    padding: 0;
+  }
+
+  .centeredLabel {
+    display: block;
+    margin: auto;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+.relative {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  position: relative;
+}
+
+.modeBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: $sizeModeBarWidth + (2 * $sizePadSmall);
+  padding: $sizePadSmall;
+  height: 100%;
+  background: $colorBgMedium;
+
+  .icon {
+    width: $sizeModeBarWidth - 2px;
+    height: $sizeModeBarWidth - 2px;
+    padding: 0;
+    box-sizing: border-box;
+    overflow: visible;
+
+    > svg {
+      margin: 1px;
+      width: 100%;
+      height: 100%;
+      display: block;
+      overflow: visible;
+
+      * {
+        fill: none;
+        stroke: none;
+      }
+    }
+
+    &.iconBg {
+      fill: $colorIconBgDefault;
+      stroke: $colorDark;
+      stroke-width: 4px;
+    }
+
+    .iconBaseColor {
+      fill: $colorBase;
+    }
+
+    .darkOutlineWhite {
+      fill: white;
+      stroke: $colorDark;
+      stroke-width: 7px;
+    }
+
+    &:hover:not(.active) {
+      .iconBg {
+        fill: $colorIconBgHover;
+      }
+    }
+
+    &.active {
+      .iconBg {
+        fill: $colorIconBgActive;
+      }
+    }
+  }
+}
+
+#app .icon {
+
+  width: $sizeIcon;
+  height: $sizeIcon;
+  margin: 0;
+  padding: 0;
+  background: $colorIconBgActive;
+  border-radius: $sizeButtonRadius;
+
+  > svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
+
+    * {
+      fill: none;
+      stroke: none;
+    }
+
+    .up, .down, .left, .right {
+      transition: all 0.5s;
+      transform-box: fill-box;
+      transform-origin: center;
+      transform: rotate(0);
+    }
+  
+    .up {
+      transform: rotate(180deg);
+    }
+  
+    .left {
+      transform: rotate(90deg);
+    }
+  
+    .right {
+      transform: rotate(-90deg)
+    }
+    
+  }
+
+  &.iconBg {
+    fill: $colorIconBgDefault;
+  }
+
+  .iconBaseColor {
+    fill: $colorBase;
+  }
+
+  .darkOutlineWhite {
+    fill: white;
+    stroke: $colorDark;
+    stroke-width: 7px;
+  }
+
+  &:hover:not(.active) {
+    .iconBg {
+      fill: $colorIconBgHover;
+    }
+  }
+
+  &.active {
+    .iconBg {
+      fill: $colorIconBgActive;
+    }
+  }
+}
+
+#app .scrollBarVert {
+  position: absolute;
+  overflow: hidden;
+  width: $sizeScrollBarWidth;
+  top: 0;
+  right: 0;
+  bottom: $sizeScrollBarWidth;
+
+  .upButton,
+  .downButton {
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+    bottom: auto;
+    height: $sizeScrollBarWidth;
+    width: $sizeScrollBarWidth;
+    background: $colorButtonBg;
+  
+    &::before {
+      content: "";
+      display: block;
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: 6px solid $colorDark;
+      border-top: none;
+      margin: 6px 3px;
+    }
+  }
+
+  .downButton {
+    bottom: 0;
+    top: auto;
+
+    &::before {
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: none;
+      border-top: 6px solid $colorDark;
+    }
+  }
+  .scrollArea {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    background: $colorBgLight;
+  }
+  
+  .scrollBarButton {
+    background: $colorButtonBg;
+    padding: 0;
+    margin: 0;
+    min-height: 30px;
+    border-radius: 2px;
+    display: block;
+    border: none;
+    left: 2px;
+    right: 2px;    
+    top: 50px;
+    position: absolute;
+  }
+}
+
+#app .scrollBarHorz {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: $sizeScrollBarWidth;
+  height: $sizeScrollBarWidth;
+  overflow: hidden;
+  background: $colorBgLight;
+
+  .upButton,
+  .downButton {
+    position: absolute;
+    display: block;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: auto;
+    width: $sizeScrollBarWidth *  $ratioValueScrollerButton;
+    background: $colorButtonBg;
+    cursor: pointer;
+   
+    &::before {
+      content: "";
+      display: block;
+      width: 0;
+      height: 0;
+      position: relative;
+      top: 3px;
+      left: 7px;
+      border-top: 6px solid transparent;
+      border-bottom: 6px solid transparent;
+      border-right: 8px solid $colorDark;
+      border-left: none;
+    }
+  }
+
+  .downButton {
+    right: 0;
+    left: auto;
+    &::before {
+      border-left: 6px solid $colorDark;
+      border-right: none;
+    }
+  }
+
+  .scrollBarButton {
+    padding: 0;
+    border-radius: 2px;
+    min-width: 30px;
+    display: block;
+    border: none;
+    position: absolute;
+    left: 50px;
+    top: 2px;
+    bottom: 2px;
+    z-index: 2;
+  }
+
+  .scrollArea {
+    position: absolute;
+    left: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    top: 0;
+    
+  }
+}
+
+#app .valueScroller {
+  width: 100%;
+  height: 5 * $sizeFontBase;
+  position: relative;
+  padding: $sizePadding;
+  user-select: none;
+
+  * {
+    user-select: none;
+  }
+
+  .scrollBarContainer {
+    position: relative;
+    margin-top: 0.5 * $sizeFontBase;
+    height: $sizeValueScrollerWidth;
+    margin-bottom: 0.5 * $sizeFontBase;
+    overflow: visible;
+
+    .upButton,
+    .downButton {
+      position: absolute;
+      display: block;
+      top: 0;
+      left: 0;
+      bottom: auto;
+      height: $sizeValueScrollerWidth;
+      width: $sizeValueScrollerWidth;
+      background: $colorButtonBg;
+    
+      &::before {
+        content: "";
+        display: block;
+        width: 0;
+        height: 0;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-bottom: 6px solid $colorDark;
+        border-top: none;
+        margin: 6px 3px;
+      }
+    }
+
+    .downButton {
+      bottom: 0;
+      top: auto;
+
+      &::before {
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-bottom: none;
+        border-top: 6px solid $colorDark;
+      }
+    }
+    .scrollArea {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      overflow: hidden;
+      overflow: visible;
+      background: $colorBgLight;
+      border-radius: calc($sizeValueScrollerWidth / 2);
+    }
+
+    .downButton + .scrollArea {
+      left: $sizeValueScrollerWidth;
+      right: $sizeValueScrollerWidth;
+    }
+    
+    .scrollBarButton {
+      position: absolute;
+      border: none;
+      width: $ratioValueScrollerButton * $sizeValueScrollerWidth;
+      background: $colorButton;
+      left: calc(($sizeValueScrollerWidth * $ratioValueScrollerButton - $sizeValueScrollerWidth) / -2);
+      top: calc(($sizeValueScrollerWidth * $ratioValueScrollerButton - $sizeValueScrollerWidth) / -2);
+      height: $ratioValueScrollerButton * $sizeValueScrollerWidth;
+      border-radius: calc($sizeValueScrollerWidth * $ratioValueScrollerButton / 2);
+    }
+  }
+
+  &.useVw {
+    height: 5 * $vwFontBase;
+  
+    .scrollBarContainer {
+      margin-top: 0.5 * $vwFontBase;
+      height: $vwValueScrollerWidth;
+      margin-bottom: 0.5 * $vwFontBase;
+  
+      .upButton,
+      .downButton {
+        height: $vwValueScrollerWidth;
+        width: $vwValueScrollerWidth;
+      }
+      
+      .scrollArea {
+        border-radius: calc($vwValueScrollerWidth / 2);
+      }
+  
+      .downButton + .scrollArea {
+        left: $vwValueScrollerWidth;
+        right: $vwValueScrollerWidth;
+      }
+      
+      .scrollBarButton {
+        width: $ratioValueScrollerButton * $vwValueScrollerWidth;
+        left: calc(($vwValueScrollerWidth * $ratioValueScrollerButton - $vwValueScrollerWidth) / -2);
+        top: calc(($vwValueScrollerWidth * $ratioValueScrollerButton - $vwValueScrollerWidth) / -2);
+        height: $ratioValueScrollerButton * $vwValueScrollerWidth;
+        border-radius: calc($vwValueScrollerWidth * $ratioValueScrollerButton / 2);
+      }
+    }
+  }
+} 
+
+#app .debug {
+  position: fixed;
+  top: 200px;
+  left: 1200px;
+  height: 800px;
+  width: 500px;
+  background: yellow;
+  z-index: 1000;
+}
+
+#app .accordionControl {
+  padding: $sizePadSmall;
+  height: 100%;
+  width: 100%;
+
+  
+  .accordionHeader {
+    display: flex;
+    justify-content: space-between;
+    background: $colorBarBg;
+    padding: $sizePadMedium;
+
+    &:hover {
+      opacity: 0.7;
+      cursor: pointer;
+    }
+    
+    > h2 {
+      padding: 0;
+      margin: 0;
+      font-size: 1.3 * $sizeFontBase;
+      line-height: 1.45 * $sizeFontBase;
+    }
+
+    .icon {
+      height: 1.6 * $sizeFontBase;
+      width: 1.6 * $sizeFontBase;
+      &.iconBg {
+        background: transparent;
+      } 
+    }  
+    
+    & + .accordionPane {
+      margin-top: $sizePadSmall;
+    }
+
+    &.disabled {
+      
+      background: $colorGrayLight;
+
+      > h2 {
+        color: $colorGrayMedium;
+      }
+
+      &:hover {
+        opacity: 1;
+        cursor: default;
+      }
+    }
+  }
+
+  .accordionPane {
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+    padding: 0;
+    transition: all .5s;
+  }
+}

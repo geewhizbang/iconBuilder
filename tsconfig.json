@@ -1,0 +1,69 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.vitest.json"
+    }
+  ],
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "target": "es6",
+    "module": "esnext",
+    "strict": true,
+    "jsx": "preserve",
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "useDefineForClassFields": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "types": [
+      "webpack-env",
+      "jest"
+    ],
+    "typeRoots": [
+      "src/types/**/*",
+      "src/types/types/**/*",
+      "src/types/types/*.d.ts"
+    ],
+    "paths": {
+      "@/*": [
+        "src/*",
+        "src/types/*.d.ts"
+      ],
+      "@root/*": [
+        "/*"
+      ],
+      "*": [
+        "src/types/types/*.d.ts"
+      ]
+    },
+    "lib": [
+      "es6",
+      "dom",
+      "dom.iterable",
+      "scripthost"
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+     "src/types/types/pinia.adaptors.types.d.ts"  
+, "src/services/bitmap.js"  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

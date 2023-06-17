@@ -1,0 +1,497 @@
+{
+    "0": {
+        "name": "Black",
+        "color": "#000000",
+        "style": {"background-color": "#000000", "color": "#FFF"}
+    },
+    "1": {
+        "name": "90% Black",
+        "color": "#1A1A1A",
+        "style": {"background-color": "#1A1A1A", "color": "#FFF"}
+    },
+    "2": {
+        "name": "80% Black",
+        "color": "#333333",
+        "style": {"background-color": "#333333", "color": "#FFF"}
+    },
+    "3": {
+        "name": "70% Black",
+        "color": "#4D4D4D",
+        "style": {"background-color": "#4D4D4D", "color": "#FFF"}
+    },
+    "4": {
+        "name": "60% Black",
+        "color": "#666666",
+        "style": {"background-color": "#666666", "color": "#FFF"}
+    },
+    "5": {
+        "name": "50% Black",
+        "color": "#808080",
+        "style": {"background-color": "#808080", "color": "#FFF"}
+    },
+    "6": {
+        "name": "40% Black",
+        "color": "#999999",
+        "style": {"background-color": "#999999", "color": "#FFF"}
+    },
+    "7": {
+        "name": "30% Black",
+        "color": "#B3B3B3",
+        "style": {"background-color": "#B3B3B3", "color": "#000"}
+    },
+    "8": {
+        "name": "20% Black",
+        "color": "#CCCCCC",
+        "style": {"background-color": "#CCCCCC", "color": "#000"}
+    },
+    "9": {
+        "name": "10% Black",
+        "color": "#E6E6E6",
+        "style": {"background-color": "#E6E6E6", "color": "#000"}
+    },
+    "10": {
+        "name": "White",
+        "color": "#FFFFFF",
+        "style": {"background-color": "#FFFFFF", "color": "#000"}
+    },
+    "11": {
+        "name": "Blue",
+        "color": "#0000FF",
+        "style": {"background-color": "#0000FF", "color": "#FFF"}
+    },
+    "12": {
+        "name": "Cyan",
+        "color": "#00FFFF",
+        "style": {"background-color": "#00FFFF", "color": "#FFF"}
+    },
+    "13": {
+        "name": "Green",
+        "color": "#00FF00",
+        "style": {"background-color": "#00FF00", "color": "#FFF"}
+    },
+    "14": {
+        "name": "Yellow",
+        "color": "#FFFF00",
+        "style": {"background-color": "#FFFF00", "color": "#FFF"}
+    },
+    "15": {
+        "name": "Red",
+        "color": "#FF0000",
+        "style": {"background-color": "#FF0000", "color": "#FFF"}
+    },
+    "16": {
+        "name": "Magenta",
+        "color": "#FF00FF",
+        "style": {"background-color": "#FF00FF", "color": "#FFF"}
+    },
+    "17": {
+        "name": "Purple",
+        "color": "#9900CC",
+        "style": {"background-color": "#9900CC", "color": "#FFF"}
+    },
+    "18": {
+        "name": "Orange",
+        "color": "#FF6600",
+        "style": {"background-color": "#FF6600", "color": "#FFF"}
+    },
+    "19": {
+        "name": "Pink",
+        "color": "#FF99CC",
+        "style": {"background-color": "#FF99CC", "color": "#000"}
+    },
+    "20": {
+        "name": "Dark Brown",
+        "color": "#663333",
+        "style": {"background-color": "#663333", "color": "#FFF"}
+    },
+    "21": {
+        "name": "Powder Blue",
+        "color": "#CCCCFF",
+        "style": {"background-color": "#CCCCFF", "color": "#000"}
+    },
+    "22": {
+        "name": "Pastel Blue",
+        "color": "#9999FF",
+        "style": {"background-color": "#9999FF", "color": "#000"}
+    },
+    "23": {
+        "name": "Baby Blue",
+        "color": "#6699FF",
+        "style": {"background-color": "#6699FF", "color": "#000"}
+    },
+    "24": {
+        "name": "Electric Blue",
+        "color": "#6666FF",
+        "style": {"background-color": "#6666FF", "color": "#000"}
+    },
+    "25": {
+        "name": "Twilight Blue",
+        "color": "#6666CC",
+        "style": {"background-color": "#6666CC", "color": "#000"}
+    },
+    "26": {
+        "name": "Navy Blue",
+        "color": "#003399",
+        "style": {"background-color": "#003399", "color": "#FFF"}
+    },
+    "27": {
+        "name": "Deep Navy Blue",
+        "color": "#000066",
+        "style": {"background-color": "#000066", "color": "#FFF"}
+    },
+    "28": {
+        "name": "Desert Blue",
+        "color": "#336699",
+        "style": {"background-color": "#336699", "color": "#FFF"}
+    },
+    "29": {
+        "name": "Sky Blue",
+        "color": "#00CCFF",
+        "style": {"background-color": "#00CCFF", "color": "#FFF"}
+    },
+    "30": {
+        "name": "Ice Blue",
+        "color": "#99FFFF",
+        "style": {"background-color": "#99FFFF", "color": "#000"}
+    },
+    "31": {
+        "name": "Light BlueGreen",
+        "color": "#99CCCC",
+        "style": {"background-color": "#99CCCC", "color": "#000"}
+    },
+    "32": {
+        "name": "Ocean Green",
+        "color": "#669999",
+        "style": {"background-color": "#669999", "color": "#FFF"}
+    },
+    "33": {
+        "name": "Moss Green",
+        "color": "#336666",
+        "style": {"background-color": "#336666", "color": "#FFF"}
+    },
+    "34": {
+        "name": "Dark Green",
+        "color": "#003333",
+        "style": {"background-color": "#003333", "color": "#FFF"}
+    },
+    "35": {
+        "name": "Forest Green",
+        "color": "#006633",
+        "style": {"background-color": "#006633", "color": "#FFF"}
+    },
+    "36": {
+        "name": "Grass Green",
+        "color": "#009933",
+        "style": {"background-color": "#009933", "color": "#FFF"}
+    },
+    "37": {
+        "name": "Kentucky Green",
+        "color": "#339966",
+        "style": {"background-color": "#339966", "color": "#FFF"}
+    },
+    "38": {
+        "name": "Light Green",
+        "color": "#33CC66",
+        "style": {"background-color": "#33CC66", "color": "#FFF"}
+    },
+    "39": {
+        "name": "Spring Green",
+        "color": "#33CC33",
+        "style": {"background-color": "#33CC33", "color": "#FFF"}
+    },
+    "40": {
+        "name": "Turquoise",
+        "color": "#66FFCC",
+        "style": {"background-color": "#66FFCC", "color": "#000"}
+    },
+    "41": {
+        "name": "Sea Green",
+        "color": "#33CC99",
+        "style": {"background-color": "#33CC99", "color": "#FFF"}
+    },
+    "42": {
+        "name": "Faded Green",
+        "color": "#99CC99",
+        "style": {"background-color": "#99CC99", "color": "#000"}
+    },
+    "43": {
+        "name": "Ghost Green",
+        "color": "#CCFFCC",
+        "style": {"background-color": "#CCFFCC", "color": "#000"}
+    },
+    "44": {
+        "name": "Mint Green",
+        "color": "#99FF99",
+        "style": {"background-color": "#99FF99", "color": "#000"}
+    },
+    "45": {
+        "name": "Army Green",
+        "color": "#669966",
+        "style": {"background-color": "#669966", "color": "#FFF"}
+    },
+    "46": {
+        "name": "Avocado Green",
+        "color": "#669933",
+        "style": {"background-color": "#669933", "color": "#FFF"}
+    },
+    "47": {
+        "name": "Martian Green",
+        "color": "#99CC33",
+        "style": {"background-color": "#99CC33", "color": "#FFF"}
+    },
+    "48": {
+        "name": "Dull Green",
+        "color": "#99CC66",
+        "style": {"background-color": "#99CC66", "color": "#000"}
+    },
+    "49": {
+        "name": "Chartreuse",
+        "color": "#99FF00",
+        "style": {"background-color": "#99FF00", "color": "#FFF"}
+    },
+    "50": {
+        "name": "Moon Green",
+        "color": "#CCFF66",
+        "style": {"background-color": "#CCFF66", "color": "#000"}
+    },
+    "51": {
+        "name": "Murky Green",
+        "color": "#333300",
+        "style": {"background-color": "#333300", "color": "#FFF"}
+    },
+    "52": {
+        "name": "Olive Drab",
+        "color": "#666633",
+        "style": {"background-color": "#666633", "color": "#FFF"}
+    },
+    "53": {
+        "name": "Khaki",
+        "color": "#999966",
+        "style": {"background-color": "#999966", "color": "#FFF"}
+    },
+    "54": {
+        "name": "Olive",
+        "color": "#999933",
+        "style": {"background-color": "#999933", "color": "#FFF"}
+    },
+    "55": {
+        "name": "Banana Yellow",
+        "color": "#CCCC33",
+        "style": {"background-color": "#CCCC33", "color": "#FFF"}
+    },
+    "56": {
+        "name": "Light Yellow",
+        "color": "#FFFF66",
+        "style": {"background-color": "#FFFF66", "color": "#000"}
+    },
+    "57": {
+        "name": "Chalk",
+        "color": "#FFFF99",
+        "style": {"background-color": "#FFFF99", "color": "#000"}
+    },
+    "58": {
+        "name": "Pale Yellow",
+        "color": "#FFFFCC",
+        "style": {"background-color": "#FFFFCC", "color": "#000"}
+    },
+    "59": {
+        "name": "Brown",
+        "color": "#996633",
+        "style": {"background-color": "#996633", "color": "#FFF"}
+    },
+    "60": {
+        "name": "Red Brown",
+        "color": "#CC6633",
+        "style": {"background-color": "#CC6633", "color": "#FFF"}
+    },
+    "61": {
+        "name": "Gold",
+        "color": "#CC9933",
+        "style": {"background-color": "#CC9933", "color": "#FFF"}
+    },
+    "62": {
+        "name": "Autumn Orange",
+        "color": "#FF6633",
+        "style": {"background-color": "#FF6633", "color": "#FFF"}
+    },
+    "63": {
+        "name": "Light Orange",
+        "color": "#FF9933",
+        "style": {"background-color": "#FF9933", "color": "#FFF"}
+    },
+    "64": {
+        "name": "Peach",
+        "color": "#FF9966",
+        "style": {"background-color": "#FF9966", "color": "#000"}
+    },
+    "65": {
+        "name": "Deep Yellow",
+        "color": "#FFCC00",
+        "style": {"background-color": "#FFCC00", "color": "#FFF"}
+    },
+    "66": {
+        "name": "Sand",
+        "color": "#FFCC99",
+        "style": {"background-color": "#FFCC99", "color": "#000"}
+    },
+    "67": {
+        "name": "Walnut",
+        "color": "#663300",
+        "style": {"background-color": "#663300", "color": "#FFF"}
+    },
+    "68": {
+        "name": "Ruby Red",
+        "color": "#990000",
+        "style": {"background-color": "#990000", "color": "#FFF"}
+    },
+    "69": {
+        "name": "Brick Red",
+        "color": "#CC3300",
+        "style": {"background-color": "#CC3300", "color": "#FFF"}
+    },
+    "70": {
+        "name": "Tropical Pink",
+        "color": "#FF6666",
+        "style": {"background-color": "#FF6666", "color": "#000"}
+    },
+    "71": {
+        "name": "Soft Pink",
+        "color": "#FF9999",
+        "style": {"background-color": "#FF9999", "color": "#000"}
+    },
+    "72": {
+        "name": "Faded Pink",
+        "color": "#FFCCCC",
+        "style": {"background-color": "#FFCCCC", "color": "#000"}
+    },
+    "73": {
+        "name": "Crimson",
+        "color": "#993366",
+        "style": {"background-color": "#993366", "color": "#FFF"}
+    },
+    "74": {
+        "name": "Regal Red",
+        "color": "#CC3366",
+        "style": {"background-color": "#CC3366", "color": "#FFF"}
+    },
+    "75": {
+        "name": "Deep Rose",
+        "color": "#CC3399",
+        "style": {"background-color": "#CC3399", "color": "#FFF"}
+    },
+    "76": {
+        "name": "Neon Red",
+        "color": "#FF0066",
+        "style": {"background-color": "#FF0066", "color": "#FFF"}
+    },
+    "77": {
+        "name": "Deep Pink",
+        "color": "#FF6699",
+        "style": {"background-color": "#FF6699", "color": "#000"}
+    },
+    "78": {
+        "name": "Hot Pink",
+        "color": "#FF3399",
+        "style": {"background-color": "#FF3399", "color": "#FFF"}
+    },
+    "79": {
+        "name": "Dusty Rose",
+        "color": "#CC6699",
+        "style": {"background-color": "#CC6699", "color": "#000"}
+    },
+    "80": {
+        "name": "Plum",
+        "color": "#660066",
+        "style": {"background-color": "#660066", "color": "#FFF"}
+    },
+    "81": {
+        "name": "Deep Violet",
+        "color": "#990099",
+        "style": {"background-color": "#990099", "color": "#FFF"}
+    },
+    "82": {
+        "name": "Light Violet",
+        "color": "#FF99FF",
+        "style": {"background-color": "#FF99FF", "color": "#000"}
+    },
+    "83": {
+        "name": "Violet",
+        "color": "#CC66CC",
+        "style": {"background-color": "#CC66CC", "color": "#000"}
+    },
+    "84": {
+        "name": "Dusty Plum",
+        "color": "#996699",
+        "style": {"background-color": "#996699", "color": "#FFF"}
+    },
+    "85": {
+        "name": "Pale Purple",
+        "color": "#CC99CC",
+        "style": {"background-color": "#CC99CC", "color": "#000"}
+    },
+    "86": {
+        "name": "Majestic Purple",
+        "color": "#9933CC",
+        "style": {"background-color": "#9933CC", "color": "#FFF"}
+    },
+    "87": {
+        "name": "Neon Purple",
+        "color": "#CC33FF",
+        "style": {"background-color": "#CC33FF", "color": "#FFF"}
+    },
+    "88": {
+        "name": "Light Purple",
+        "color": "#CC66FF",
+        "style": {"background-color": "#CC66FF", "color": "#000"}
+    },
+    "89": {
+        "name": "Twilight Violet",
+        "color": "#9966CC",
+        "style": {"background-color": "#9966CC", "color": "#000"}
+    },
+    "90": {
+        "name": "Easter Purple",
+        "color": "#CC99FF",
+        "style": {"background-color": "#CC99FF", "color": "#000"}
+    },
+    "91": {
+        "name": "Deep Purple",
+        "color": "#330066",
+        "style": {"background-color": "#330066", "color": "#FFF"}
+    },
+    "92": {
+        "name": "Grape",
+        "color": "#663399",
+        "style": {"background-color": "#663399", "color": "#FFF"}
+    },
+    "93": {
+        "name": "Blue Violet",
+        "color": "#9966FF",
+        "style": {"background-color": "#9966FF", "color": "#000"}
+    },
+    "94": {
+        "name": "Blue Purple",
+        "color": "#9900FF",
+        "style": {"background-color": "#9900FF", "color": "#FFF"}
+    },
+    "95": {
+        "name": "Deep River",
+        "color": "#6600CC",
+        "style": {"background-color": "#6600CC", "color": "#FFF"}
+    },
+    "96": {
+        "name": "Deep Azure",
+        "color": "#6633FF",
+        "style": {"background-color": "#6633FF", "color": "#FFF"}
+    },
+    "97": {
+        "name": "Storm Blue",
+        "color": "#330099",
+        "style": {"background-color": "#330099", "color": "#FFF"}
+    },
+    "98": {
+        "name": "Deep Blue",
+        "color": "#3300CC",
+        "style": {"background-color": "#3300CC", "color": "#FFF"
+    }
+}

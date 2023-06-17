@@ -1,0 +1,38 @@
+<svg id="menu" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" height="380" width="170" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="0 0 170.00001 380.00001">
+    <g id="pick" fill-rule="evenodd" transform="translate(0 .44350)">
+        <path fill="#e6e6e6" d="m0.001306 5.2531v28.5q0 5.2495 5.2492 5.2495h28.5q5.2495 0 5.2495-5.2495v-28.5q0-5.2495-5.2495-5.2495h-28.5q-5.2492 0-5.2492 5.2495z" />
+        <path fill="#fff" d="m28.102 30.17-6.059-6.078-3.959 8.942-4.572-2.024 3.959-8.943-8.5718-0.399 18.508-15.865 0.695 24.367z" stroke="#000" />
+    </g>
+    <g id="rectangle" fill-rule="evenodd" transform="translate(0 .44350)">
+        <path fill="#e6e6e6" d="m0 173.25v28.501q0 5.2494 5.2492 5.2494h28.501q5.2494 0 5.2494-5.2494v-28.501q0-5.2494-5.2494-5.2494h-28.501q-5.249 0-5.249 5.25z" />
+        <path d="m8.02 175.77v23.562h23.562v-23.562h-23.562z" stroke="#000" stroke-width="1.4384" fill="#fff" />
+    </g>
+    <g id="circle" fill-rule="evenodd" transform="translate(0 .44350)">
+        <path fill="#e6e6e6" d="m0.001306 215.25v28.5q0 5.2495 5.2492 5.2495h28.5q5.2495 0 5.2495-5.2495v-28.5q0-5.2495-5.2495-5.2495h-28.5q-5.2492 0-5.2492 5.2495z" />
+        <path d="m19.501 217a12.5 12.5 0 0 1 12.5 12.5 12.5 12.5 0 1 1 -12.5 -12.5z" stroke="#000" stroke-width="1.3889" fill="#fff" />
+    </g>
+    <g id="polygon" fill-rule="evenodd" transform="translate(0 .44350)">
+        <path fill="#e6e6e6" d="m0.001306 257.25v28.5q0 5.2495 5.2492 5.2495h28.5q5.2495 0 5.2495-5.2495v-28.5q0-5.2495-5.2495-5.2495h-28.5q-5.2492 0-5.2492 5.2495z" />
+        <path d="m19.501 257.45 12.163 7.0209v14.045l-12.163 7.0209-12.163-7.0209v-14.045l12.163-7.0209z" stroke="#000" stroke-width="1.3889" fill="#fff" />
+    </g>
+    <g id="node" transform="translate(0 .44350)">
+        <path fill-rule="evenodd" fill="#e6e6e6" d="m0 89.25v28.501q0 5.2494 5.2492 5.2494h28.501q5.2494 0 5.2494-5.2494v-28.501q0-5.2494-5.2494-5.2494h-28.501q-5.249 0.001-5.249 5.25z" />
+        <path d="m10.39 113.89c-2.8094-8.65 9.984-20.383 20.606-18.61" stroke="#000" stroke-width="1.3889" fill="none" />
+        <path fill-rule="evenodd" fill="#666" d="m27.69 108.42-3.5353 3.5356-3.4142-6.95 6.9494 3.4144z" />
+        <path d="m16.75 97.75a2.75 2.75 0 0 1 2.75 2.75 2.75 2.75 0 1 1 -2.75 -2.75z" fill-rule="evenodd" stroke="#000" stroke-width="1.3889" fill="#fff" />
+    </g>
+    <g id="line" transform="translate(0 .44350)">
+        <path fill-rule="evenodd" fill="#e6e6e6" d="m-0.002694 131.26v28.5q0 5.2492 5.2492 5.2492h28.5q5.2495 0 5.2495-5.2492v-28.5q0-5.2495-5.2495-5.2495h-28.5q-5.2492 0-5.2492 5.2495z" />
+        <path d="m25.61 132.24c3.1353 0.52278 6.0014 4.2597 5.9147 7.5756-0.10528 4.0197-3.8486 7.5411-7.6519 5.4897-5.2331-2.8219-9.1936-7.3919-12.668-2.3914-2.8914 4.1639 6.3722 5.9986 0.41944 14.066" stroke="#000" stroke-width="1.3889" fill="none" />
+        <path fill-rule="evenodd" fill="#666" d="m33.45 156.18-3.5356 3.5356-3.4142-6.9497 6.9497 3.4142z" />
+    </g>
+    <g id="zoom" fill-rule="evenodd" transform="translate(0 .44350)">
+        <path fill="#e6e6e6" d="m0.001306 47.255v28.5q0 5.2495 5.2492 5.2495h28.5q5.2495 0 5.2495-5.2495v-28.5q0-5.2495-5.2495-5.2495h-28.5q-5.2492 0-5.2492 5.2495z" />
+        <path d="m18.471 49.255a7.5001 7.5001 0 0 1 7.5 7.5 7.5001 7.5001 0 1 1 -7.5 -7.5z" stroke="#000" stroke-width="1.3889" fill="#fff" />
+        <path d="m20.01 64.033 3.3836-1.6181 4.6378 9.6987-3.3834 1.6181-4.6381-9.6987z" />
+    </g>
+    <g id="text">
+        <path fill-rule="evenodd" fill="#e6e6e6" d="m0.001306 299.69v28.5q0 5.2495 5.2492 5.2495h28.5q5.2495 0 5.2495-5.2495v-28.5q0-5.2495-5.2495-5.2495h-28.5q-5.2492 0-5.2492 5.2495z" />
+        <text style="word-spacing:0px;letter-spacing:0px" transform="scale(.96519 1.0361)" xml:space="preserve" line-height="125%" font-size="37.5px" y="315.44696" x="7.8901811" font-family="&apos;Bodoni Bd BT&apos;" fill="#000000"><tspan y="315.44696" x="7.8901811">A</tspan></text>
+    </g>
+</svg>
