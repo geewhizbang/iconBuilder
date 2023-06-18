@@ -40,10 +40,9 @@ $sizeIcon: 2 * $sizeFontBase;
 $sizeIconRadius: 0.2 * $sizeFontBase;
 
 $vwFontBase: 0.65vw;
-$vwValueScrollerWidth: 2 * $vwFontBase;
-$vwValueScrollerWidth:  2 * $vwFontBase;
-
+$vwPadSmall: 0.2 * $vwFontBase;
+$vwPadMedium: 0.8 * $vwFontBase;
+$vwValueScrollerWidth: 0.7 * $vwFontBase;
 $sizeValueScrollerWidth: $sizeFontBase * 0.7;
-
 
 $gradientVerticalFadeDown: linear-gradient(180deg, rgba(219,228,241,1) 0%, rgba(231,234,241,1) 60%, rgba(255,255,255,1) 100%)

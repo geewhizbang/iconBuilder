@@ -46,7 +46,7 @@
         </div>
       </div>
     </div>
-    <div class="sidePanel">
+    <div class="sidePanel useVw">
       <AccordionControl
         :state="{
           colorWheel: { open: true, disabled: false },
@@ -207,6 +207,7 @@
                 v-on:change="change"
                 name="wheelS"
                 :showValue="true"
+                :useVw="true"
               />
               <ValueScroller
                 :model-value="wheel.l"
@@ -216,6 +217,7 @@
                 v-on:change="change"
                 name="wheelL"
                 :showValue="true"
+                :useVw="true"
               />
               <ValueScroller
                 :model-value="wheel.compAngle"
@@ -225,6 +227,7 @@
                 v-on:change="change"
                 name="wheelCompAngle"
                 :showValue="true"
+                :useVw="true"
               />
             </div>
           </template>
