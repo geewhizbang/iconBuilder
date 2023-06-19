@@ -63,20 +63,37 @@ export type RgbColor = {
   [key in RgbColorKeys]: number;
 }
 
-export type AccordionKeys = | "open" | "disabled";
+export type AccordionPanelConfigKeys = | "open" | "disabled";
 
-export type AccordionPanelState = {
-  [key in AccordionKeys]: boolean; 
+export type AccordionPanelConfig = {
+  [key in AccordionPanelConfigKeys]: boolean;
 };
 
-export type AccordionState = {
-  [key: string]: AccordionPanelState;
+export type AccordionConfig = {
+  [key: string]: AccordionPanelConfig;
 }
 
+export type AccordionPropKeys = | 'isVert' | 'allOpen'
+export type AccordionProps = {
+  [key in AccordionPropKeys]: boolean;
+}
+
+export type AccordionSizeHandler = (height: string) => void;
+
+export type AccordionPanelChange = (open: boolean, disabled: boolean, height: string) => {};
+
 export type AccordionData = {
-  state: AccordionState;
-  height: number,
-  headerHeight: number,
+  config: AccordionConfig;
+  props: AccordionProps;
+  parentRef: HTMLElement;
+  childCount: number;
+}
+
+export type AccordionAction = () => void;
+
+export type AccordionPanelData = {
+  headerRef: HTMLElement;
+  changeHandler: AccordionPanelChange;
 }
 
 export type AccordionStates = {
@@ -87,12 +104,4 @@ export type AccordionChildMap = {
   [key: string]: string;
 }
 
-export type AccordionPropKeys = | 'isVert' | 'allOpen'
-export type AccordionProps = {
-  [key in AccordionPropKeys]: boolean;
-}
-
-export type ActionHandler = () => void;
-
-export type AccordionAction = (open: boolean, disabled: boolean) => {};
 

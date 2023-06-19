@@ -60,6 +60,15 @@ div {
   }
 }
 
+#app .footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: $sizeFooterHeight;
+  background: $colorBgLight;
+}
+
 .relative {
   width: 100%;
   height: 100%;
@@ -466,7 +475,6 @@ div {
   padding: $sizePadSmall;
   height: 100%;
   width: 100%;
-
   
   .accordionHeader {
     display: flex;
@@ -487,15 +495,15 @@ div {
     }
 
     .icon {
-      height: 1.6 * $sizeFontBase;
-      width: 1.6 * $sizeFontBase;
+      height: 1.7 * $sizeFontBase;
+      width: 1.7 * $sizeFontBase;
       &.iconBg {
         background: transparent;
       } 
     }  
     
     & + .accordionPane {
-      margin-top: $sizePadSmall;
+      margin-top: $sizePadMedium;
     }
 
     &.disabled {
@@ -530,23 +538,17 @@ div {
 
     h2 {
       font-size: 1.3 * $vwFontBase;
-      line-height: 1.45 * $vwFontBase;
+      line-height: 1.4 * $vwFontBase;
     }
 
     .icon {
-      height: 1.6 * $vwFontBase;
-      width: 1.6 * $vwFontBase;
+      height: 1.5 * $vwFontBase;
+      width: 1.5 * $vwFontBase;
     }  
     
     & + .accordionPane {
       margin-top: $vwPadSmall;
     }
 
-    
-    h2 {
-      font-size: 1.5 * $vwFontBase;
-    }
   }
-
-  
 }

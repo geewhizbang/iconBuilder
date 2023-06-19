@@ -6,52 +6,39 @@
 
 <script lang="ts">
 
-import type {AccordionState, AccordionData} from '@/types/global';
-import { defineComponent, type PropType, ref } from 'vue';
+import type {AccordionConfig } from '@/types/global';
+import { defineComponent, type PropType } from 'vue';
 import { AccordionService } from '../services/AccordionService';
 
 export default defineComponent({
   name: "AccordionControl",
-  setup(props) {
-
-    let data: AccordionData = {
-      state: props.state,
-      height: 0,
-      headerHeight: 0,
-    }
+  setup() {
 
     return {
-      data: ref(data),
       id: "",
     };
 
   },
   mounted() {
     setTimeout(() => {
-      this.getHeight();
-      this.id = AccordionService.registerParent(this.data, this.isVert, this.allOpen);
+      this.id = AccordionService.registerParent(
+        this.config, this.isVert, this.allOpen, this.$refs["panel"] as HTMLElement);
+      window.addEventListener("resize", this.resize);
     }, 1);
 
-    window.addEventListener("resize", this.setHeight);
   },
   unmounted() {
-    window.removeEventListener("resize", this.setHeight);
+    window.removeEventListener("resize", this.resize);
+    AccordionService.clear(this.id);
   },
   methods: {
-    getHeight() {
-      const rect = (this.$refs["panel"] as HTMLDivElement).getBoundingClientRect();
-      console.log("getHeight: " + rect.height);
-      this.data.height = rect.height;
-    },
-    setHeight() : void {
-      this.getHeight();
-      AccordionService.setHeight(this.id, this.data.height);
-      console.log("set height: " + this.data.height);
+    resize() : void {
+      AccordionService.resize(this.id);
     }
   },
   props: {
-    state: {
-      type: Object as PropType<AccordionState>,
+    config: {
+      type: Object as PropType<AccordionConfig>,
       required: true,
     },
     isVert: {

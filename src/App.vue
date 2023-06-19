@@ -25,9 +25,10 @@ export default {
 
 <template>
   <header>
-    <div class="appMenu">I wuz here</div>
+    <div class="appMenu" id="appMenu"></div>
   </header>
   <RouterView />
+  <div class="footer"></div>
 </template>
 
 <style lang="scss">

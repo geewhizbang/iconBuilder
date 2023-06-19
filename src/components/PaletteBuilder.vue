@@ -48,7 +48,7 @@
     </div>
     <div class="sidePanel useVw">
       <AccordionControl
-        :state="{
+        :config="{
           colorWheel: { open: true, disabled: false },
           colorMixer: { open: false, disabled: false },
           colorSelector: { open: false, disabled: true },
@@ -71,22 +71,12 @@
                   ></canvas>
                 </div>
                 <div class="wheelInterface" v-on:click="wheelClick">
-                  <svg
-                    ref="wheelInterface"
-                    viewBox="0 0 400 400"
-                    style="
-                      clip-rule: evenodd;
-                      fill-rule: evenodd;
-                      image-rendering: optimizeQuality;
-                      shape-rendering: geometricPrecision;
-                      text-rendering: geometricPrecision;
-                    "
-                  >
+                  <svg ref="wheelInterface" viewBox="0 0 400 400">
                     <path
                       class="overlay"
                       v-on:mouseenter="blockWheelClick(true)"
                       v-on:mouseleave="blockWheelClick(false)"
-                      d="M0 0l401 0 0 401 -401 0 0 -401zm201 4c109,0 197,88 197,197 0,109 -88,197 -197,197 -109,0 -197,-88 -197,-197 0,-109 88,-197 197,-197zm0 46c83,0 151,67 151,151 0,83 -67,151 -151,151 -83,0 -151,-67 -151,-151 0,-83 67,-151 151,-151z"
+                      d="M0 0l400 0 0 400 -400 0 0 -400zm200 7c107,0 193,86 193,193 0,107 -86,193 -193,193 -107,0 -193,-86 -193,-193 0,-107 86,-193 193,-193zm0 42c83,0 151,67 151,151 0,83 -67,151 -151,151 -83,0 -151,-67 -151,-151 0,-83 67,-151 151,-151z"
                     ></path>
                     <circle
                       class="center"
@@ -261,7 +251,7 @@ import ValueScroller from '../controls/ValueScroller.vue';
 import AccordionControl from '../controls/AccordionControl.vue';
 import AccordionPane from '../controls/AccordionPane.vue';
 
-import { AccordionState, ChangeValue, type HslColor, type RgbColor } from '../types/global'
+import { ChangeValue, type HslColor, type RgbColor } from '../types/global'
 
 // import axios from "axios";
 
@@ -364,8 +354,8 @@ export default defineComponent({
 
     const wheel: Wheel = {
       center: {
-        x: 201,
-        y: 201,
+        x: 200,
+        y: 200,
       },
       comp: {
         x: 140,
@@ -397,8 +387,8 @@ export default defineComponent({
       hueAngle: baseColorHSL.h * 360,
       l: baseColorHSL.l,
       s: baseColorHSL.s,
-      innerRadius: 0.74,
-      outerRadius: 0.99,
+      innerRadius: 0.73,
+      outerRadius: 1,
       tileSize: 20,
       blockClick: false,
     }

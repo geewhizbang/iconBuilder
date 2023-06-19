@@ -14,6 +14,11 @@ const router = createRouter({
       name: 'colorPicker',
       component: () => import('../views/ColorPicker.vue')
     },
+    {
+      path: '/svgScaler',
+      name: 'svgScaler',
+      component: () => import('../views/SvgRescale.vue')
+    },
     // {
     //   path: '/colorWheel',
     //   name: 'colorWheel',
