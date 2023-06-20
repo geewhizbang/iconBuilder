@@ -3,9 +3,12 @@
     <div class="templateColors">
       <div v-for="(color, key) in colors" :key="key" class="colorGroup">
         <div class="parent">
-          <label class="label">{{ color.name }}</label>
           <div class="colorSwatch" v-on:click="editColor(key.toString())">
-            <div :style="{ background: color.color }"></div>
+            <div :style="{ background: color.color }">
+              <label class="label" :class="{ white: color.hslColor.l < 0.45 }">{{
+                color.name
+              }}</label>
+            </div>
           </div>
         </div>
         <div class="children">
@@ -14,7 +17,6 @@
               v-for="(childColor, index) in color.sChildren"
               :key="key + '.' + childColor.name"
             >
-              <label class="label">{{ childColor.name }}</label>
               <div
                 :class="{
                   selected: key + '.' + childColor.name == state.currentColorKey,
@@ -22,7 +24,9 @@
                 class="colorSwatch"
                 v-on:click="editColor(key + '.' + index)"
               >
-                <div :style="{ background: childColor.color }"></div>
+                <div :style="{ background: childColor.color }">
+                  <label class="label">{{ childColor.name }}</label>
+                </div>
               </div>
             </div>
           </div>
@@ -31,7 +35,6 @@
               v-for="(childColor, index) in color.lChildren"
               :key="key + '.' + childColor.name"
             >
-              <label class="label">{{ childColor.name }}</label>
               <div
                 :class="{
                   selected: key + '.' + childColor.name == state.currentColorKey,
@@ -39,7 +42,9 @@
                 class="colorSwatch"
                 v-on:click="editColor(key + '.' + index)"
               >
-                <div :style="{ background: childColor.color }"></div>
+                <div :style="{ background: childColor.color }">
+                  <label class="label">{{ childColor.name }}</label>
+                </div>
               </div>
             </div>
           </div>
@@ -59,7 +64,7 @@
             <h2>Create Color Scheme</h2>
           </template>
           <template v-slot:content>
-            <div class="colorWheel">
+            <div class="accordionContents">
               <label>Click wheel to select Base Color</label>
               <div class="wheelContainer">
                 <div class="wheelInterface">
@@ -210,12 +215,12 @@
                 :useVw="true"
               />
               <ValueScroller
-                :model-value="wheel.compAngle"
+                :model-value="wheel.splitAngle"
                 :minValue="10"
-                :maxValue="45"
-                label="Compliment Angle"
+                :maxValue="30"
+                label="Split Angle"
                 v-on:change="change"
-                name="wheelCompAngle"
+                name="wheelSplitAngle"
                 :showValue="true"
                 :useVw="true"
               />
@@ -227,7 +232,10 @@
             <h2>Color Mixer</h2>
           </template>
           <template v-slot:content>
-            <h1>Stuff here</h1>
+            <div class="accordionContents">
+              <label>Drag Colors from right screen</label>
+              <div></div>
+            </div>
           </template>
         </AccordionPane>
         <AccordionPane panelName="colorSelector">
@@ -274,7 +282,7 @@ interface Wheel {
   b: XY;
   baseA: XY;
   baseB: XY;
-  compAngle: number;
+  splitAngle: number;
   hueAngle: number;
   l: number,
   s: number,
@@ -309,7 +317,7 @@ export default defineComponent({
 
     const colors: TemplateColors = {
       baseA: {
-        name: 'Base A',
+        name: 'Split A',
         hslColor: { h: 0, s: 0, l: 1 },
         color: '',
         sChildren: [],
@@ -323,14 +331,14 @@ export default defineComponent({
         lChildren: [],
       },
       baseB: {
-        name: 'Base B',
+        name: 'Split B',
         hslColor: { h: 0, s: 0, l: 1 },
         color: '',
         sChildren: [],
         lChildren: [],
       },
       compA: {
-        name: 'Complimentary A',
+        name: 'Comp Split A',
         hslColor: { h: 0, s: 0, l: 1 },
         color: '',
         sChildren: [],
@@ -344,7 +352,7 @@ export default defineComponent({
         lChildren: [],
       },
       compB: {
-        name: 'Complimentary B',
+        name: 'Comp Split B',
         hslColor: { h: 0, s: 0, l: 1 },
         color: '',
         sChildren: [],
@@ -383,7 +391,7 @@ export default defineComponent({
       },
       size: 400,
       timeout: null,
-      compAngle: 35,
+      splitAngle: 20,
       hueAngle: baseColorHSL.h * 360,
       l: baseColorHSL.l,
       s: baseColorHSL.s,
@@ -460,10 +468,10 @@ export default defineComponent({
     calculateWheel(): void {
       const angle = 360 - this.colors.base.hslColor.h * 360;
       this.wheel.base = this.getWheelPos((angle + 180) % 360, true);
-      const compAngle = angle % 360;
-      this.wheel.comp = this.getWheelPos(compAngle, false);
-      const angleA = compAngle - this.wheel.compAngle;
-      const angleB = compAngle + this.wheel.compAngle;
+      const splitAngle = angle % 360;
+      this.wheel.comp = this.getWheelPos(splitAngle, false);
+      const angleA = splitAngle - this.wheel.splitAngle;
+      const angleB = splitAngle + this.wheel.splitAngle;
       this.wheel.a = this.getWheelPos(angleA, false);
       this.wheel.b = this.getWheelPos(angleB, false);
       this.wheel.baseA = this.getWheelPos((angleA + 180) % 360, false);
@@ -490,7 +498,7 @@ export default defineComponent({
       );
       this.colors.compA.hslColor = ColorConverter.GetHslOffsetColor(
         this.colors.comp.hslColor,
-        this.wheel.compAngle
+        this.wheel.splitAngle
       );
       this.colors.compA.color = ColorConverter.RGBtoString(
         ColorConverter.HslToRgb(this.colors.compA.hslColor)
@@ -502,13 +510,11 @@ export default defineComponent({
 
       this.colors.compB.hslColor = ColorConverter.GetHslOffsetColor(
         this.colors.comp.hslColor,
-        -this.wheel.compAngle
+        -this.wheel.splitAngle
       );
-
       this.colors.compB.color = ColorConverter.RGBtoString(
         ColorConverter.HslToRgb(this.colors.compB.hslColor)
       );
-
 
       this.colors.baseB.hslColor = ColorConverter.GetHslOffsetColor(this.colors.compB.hslColor, 180);
       this.colors.baseB.color = ColorConverter.RGBtoString(
@@ -526,7 +532,7 @@ export default defineComponent({
 
         satValues.forEach(sat => {
           const childColor = this.colors[color].hslColor;
-          const hslColor = { h: childColor.h, s: sat, l: childColor.l };
+          const hslColor = { h: childColor.h, s: sat, l: Math.min(0.6, Math.max(0.4, childColor.l)) };
           const child = {
             name: "Saturation: " + Math.round(sat * 100) / 100,
             color: ColorConverter.RGBtoString(ColorConverter.HslToRgb(hslColor)),
@@ -582,8 +588,8 @@ export default defineComponent({
           this.wheel.s = a.value;
           CanvasTool.drawImages(this.wheel.l, this.wheel.s);
           break;
-        case 'wheelCompAngle': {
-          this.wheel.compAngle = a.value;
+        case 'wheelSplitAngle': {
+          this.wheel.splitAngle = a.value;
           break;
         }
       }
@@ -609,10 +615,10 @@ export default defineComponent({
 
 $boxSize: 5.95vw;
 $panelWidth: 21vw;
-$sizeWheel: 18vw;
+$sizeLeftPanel: 18vw;
 $smallPad: 0.2vw;
 $largePad: 1vw;
-$rowMargin: $largePad;
+$rowMargin: $smallPad;
 $medPad: $largePad * 0.66;
 $horzSpacing: math.div($largePad, 3);
 $wheelPad: 1.4vw;
@@ -669,15 +675,6 @@ $wheelPad: 1.4vw;
         height: auto;
       }
 
-      .label {
-        display: block;
-        box-sizing: border-box;
-        height: $medPad;
-        padding-left: $medPad * 0.7;
-        line-height: $vwFontBase;
-        font-size: 0.82 * $vwFontBase;
-      }
-
       .colorSwatch {
         width: $boxSize;
         height: $boxSize;
@@ -697,6 +694,23 @@ $wheelPad: 1.4vw;
           width: 100%;
           height: 100%;
           border-radius: $vwFontBase * 0.7;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+
+          .label {
+            display: block;
+            box-sizing: border-box;
+            height: $medPad;
+            line-height: $vwFontBase;
+            font-size: 0.86 * $vwFontBase;
+            text-align: center;
+            font-weight: 600;
+
+            &.white {
+              color: white;
+            }
+          }
         }
       }
 
@@ -707,16 +721,55 @@ $wheelPad: 1.4vw;
         flex-direction: column;
 
         > .row {
-          height: calc(100% - 1.8vw);
+          height: $boxSize * 0.5;
           width: 100%;
           display: flex;
           flex-direction: row;
 
           > div {
             height: 100%;
+            position: relative;
+            overflow: visible;
 
             > .colorSwatch {
-              height: calc(100% - 1vw);
+              height: 100%;
+
+              &::before {
+                content: "";
+                display: block;
+                position: absolute;
+                left: calc(50% - 0.2vw);
+                width: 0.4vw;
+                height: 0.4vw;
+                top: -0.2vw;
+                background: $colorGrayDark;
+                transform: rotate(45deg);
+                opacity: 0;
+                transition: all 0.5s;
+              }
+
+              label {
+                position: absolute;
+                top: -0.9vw;
+                height: 0.95vw;
+                border-radius: 0.2vw;
+                line-height: 0.3 * $vwFontBase;
+                padding: 0.35vw 0.5vw;
+                background: $colorGrayDark;
+                color: white;
+                opacity: 0;
+                transition: all 0.5s;
+              }
+
+              &:hover {
+                &::before {
+                  opacity: 1;
+                }
+
+                label {
+                  opacity: 1;
+                }
+              }
             }
           }
         }
@@ -733,11 +786,11 @@ $wheelPad: 1.4vw;
     overflow-y: auto;
   }
 
-  .colorWheel {
-    width: $sizeWheel;
-    margin-left: calc((100% - $sizeWheel) / 2);
-    height: $sizeWheel;
-    padding-top: $sizePadMedium;
+  .accordionContents {
+    width: $sizeLeftPanel;
+    margin-left: calc((100% - $sizeLeftPanel) / 2);
+    height: $sizeLeftPanel;
+    padding-top: 1vw;
     margin-bottom: 50px;
 
     > label {
@@ -756,8 +809,8 @@ $wheelPad: 1.4vw;
     }
 
     .wheelInterface {
-      width: $sizeWheel;
-      height: $sizeWheel;
+      width: $sizeLeftPanel;
+      height: $sizeLeftPanel;
       position: absolute;
       top: 0;
       left: 0;
@@ -823,7 +876,7 @@ $wheelPad: 1.4vw;
 
   .wheelAdjust {
     width: 100%;
-    padding: 0 3vw 0.7vw 3vw;
+    padding: 2vw 3vw 0.7vw 3vw;
     height: auto;
   }
 }

@@ -423,7 +423,9 @@ div {
   }
 
   &.useVw {
-    height: 5 * $vwFontBase;
+    height: 4 * $vwFontBase;
+    padding: 0.5 * $vwFontBase $vwPadMedium 0 $vwPadMedium;
+    margin: 0;
 
     label {
       font-size: $vwFontBase;
