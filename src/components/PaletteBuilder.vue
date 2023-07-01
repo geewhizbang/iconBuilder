@@ -87,7 +87,7 @@
                       class="center"
                       :cx="wheel.center.x"
                       :cy="wheel.center.y"
-                      r="13"
+                      r="11"
                     />
                     <circle
                       class="outerCircle"
@@ -95,16 +95,16 @@
                       :cy="wheel.base.y"
                       r="23"
                     />
-                    <circle class="ab" :cx="wheel.a.x" :cy="wheel.a.y" r="20" />
+                    <circle class="ab" :cx="wheel.a.x" :cy="wheel.a.y" r="14" />
+                    <circle class="ab" :cx="wheel.b.x" :cy="wheel.b.y" r="14" />
+                    <circle class="ab" :cx="wheel.baseA.x" :cy="wheel.baseA.y" r="14" />
+                    <circle class="ab" :cx="wheel.baseB.x" :cy="wheel.baseB.y" r="14" />
                     <circle
                       class="outerCircle"
                       :cx="wheel.comp.x"
                       :cy="wheel.comp.y"
-                      r="20"
+                      r="14"
                     />
-                    <circle class="ab" :cx="wheel.b.x" :cy="wheel.b.y" r="20" />
-                    <circle class="ab" :cx="wheel.baseA.x" :cy="wheel.baseA.y" r="20" />
-                    <circle class="ab" :cx="wheel.baseB.x" :cy="wheel.baseB.y" r="20" />
                     <line
                       class="lineBase"
                       :x1="wheel.center.x"
@@ -148,39 +148,39 @@
                       :y2="wheel.baseB.y"
                     />
                     <circle
-                      :cx="wheel.a.x"
-                      :cy="wheel.a.y"
-                      r="16"
-                      :style="{ fill: colors.compA.color }"
-                    />
-                    <circle
                       :cx="wheel.base.x"
                       :cy="wheel.base.y"
                       r="19"
                       :style="{ fill: colors.base.color }"
                     />
                     <circle
+                      :cx="wheel.a.x"
+                      :cy="wheel.a.y"
+                      r="11"
+                      :style="{ fill: colors.compA.color }"
+                    />
+                    <circle
                       :cx="wheel.b.x"
                       :cy="wheel.b.y"
-                      r="16"
+                      r="11"
                       :style="{ fill: colors.compB.color }"
                     />
                     <circle
                       :cx="wheel.baseA.x"
                       :cy="wheel.baseA.y"
                       :style="{ fill: colors.baseA.color }"
-                      r="16"
+                      r="11"
                     />
                     <circle
                       :cx="wheel.baseB.x"
                       :cy="wheel.baseB.y"
-                      r="16"
+                      r="11"
                       :style="{ fill: colors.baseB.color }"
                     />
                     <circle
                       :cx="wheel.comp.x"
                       :cy="wheel.comp.y"
-                      r="16"
+                      r="11"
                       :style="{ fill: colors.comp.color }"
                     />
                     <circle
@@ -216,8 +216,8 @@
               />
               <ValueScroller
                 :model-value="wheel.splitAngle"
-                :minValue="10"
-                :maxValue="30"
+                :minValue="wheel.minSplit"
+                :maxValue="wheel.maxSplit"
                 label="Split Angle"
                 v-on:change="change"
                 name="wheelSplitAngle"
@@ -292,6 +292,8 @@ interface Wheel {
   tileSize: number,
   blockClick: boolean,
   timeout: NodeJS.Timeout | null,
+  minSplit: number,
+  maxSplit: number,
 }
 
 interface TemplateColorParent extends TemplateColor {
@@ -399,7 +401,20 @@ export default defineComponent({
       outerRadius: 1,
       tileSize: 20,
       blockClick: false,
+      minSplit: 10,
+      maxSplit: 30,
     }
+
+    const wheelDrag = {
+      startX: -1,
+      startY: -1,
+      timer: -1,
+      time: -1,
+      inDrag: false,
+      debounce: 10,
+      angle: -1,
+      colorName: "",
+    };
 
     let definedColors: { [key: string]: boolean } = {}
     Object.keys(colors).forEach((key: string) => {
@@ -414,6 +429,7 @@ export default defineComponent({
         tempColor: ColorConverter.HslToRgb(ColorConverter.HexToHSL('#CCCCFF')),
         lightDark: 1,
       }),
+      wheelDrag: wheelDrag,
       colors: ref(colors),
       wheel: ref(wheel),
     }
@@ -449,6 +465,87 @@ export default defineComponent({
     window.removeEventListener("resize", this.initCanvas);
   },
   methods: {
+    // mouseDown(): Boolean {
+    //   this.wheelDrag.inDrag = true;
+    //   window.addEventListener("mousemove", this.mouseMove);
+    //   window.addEventListener("mouseup", this.mouseUp);
+    //   window.addEventListener("blur", this.mouseUp);
+    //   return false;
+    // },
+    // mouseMove(event: MouseEvent) {
+    //   if (this.wheelDrag.startY == -1) {
+    //     this.wheelDrag.startX = event.clientX;
+    //     this.wheelDrag.startY = event.clientY;
+    //   } else {
+
+    //     let xD = event.clientX - this.wheelDrag.startX;
+    //     let yD = event.clientY - this.wheelDrag.startY;
+
+    //     const moveDistance = Math.sqrt((xD * xD) + (yD * yD));
+    //     if (moveDistance > 2) {
+    //       const wheelRect = (this.$refs['canvasElement'] as HTMLCanvasElement).getBoundingClientRect();
+    //       const xCenter = wheelRect.left + wheelRect.width / 2;
+    //       const yCenter = wheelRect.top + wheelRect.height / 2;
+    //       xD = event.clientX - xCenter;
+    //       yD = event.clientY - yCenter;
+
+    //       const xAbs = Math.abs(xD);
+    //       const yAbs = Math.abs(yD);
+    //       const calculatedAngle = (yAbs < 0.000001 ? Math.PI / 2 : Math.atan(xAbs / yAbs));
+    //       let angle = 0;
+    //       if (xD >= 0) {
+    //         if (yD <= 0) {
+    //           angle = calculatedAngle;
+    //         } else {
+    //           angle = Math.PI - calculatedAngle;
+    //         }
+    //       } else {
+    //         if (yD <= 0) {
+    //           angle = 2 * Math.PI - calculatedAngle;
+    //         } else {
+    //           angle = Math.PI + calculatedAngle;
+    //         }
+    //       }
+
+    //       this.wheelDrag.angle = angle / Math.PI * 180;
+
+    //       let time = new Date().getTime();
+    //       if (time > this.wheelDrag.time + this.wheelDrag.debounce && this.wheelDrag.timer > 0) {
+    //         this.moveMouse();
+    //       } else {
+    //         this.wheelDrag.timer = window.setTimeout(() => {
+    //           this.moveMouse();
+    //         }, this.wheelDrag.debounce);
+    //       }
+    //     }
+    //   }
+    //   return false;
+    // },
+    // mouseEnter(colorName: string) : void {
+    //   this.wheelDrag.inDrag = true;
+    //   this.wheelDrag.colorName = colorName;
+    // },
+    // mouseUp() {
+    //   this.wheelDrag.inDrag = false;
+    //   this.moveMouse();
+    //   this.wheelDrag.startX = -1;
+    //   this.wheelDrag.startY = -1;
+    //   window.removeEventListener("mousemove", this.mouseMove);
+    //   window.removeEventListener("mouseup", this.mouseUp);
+    // },
+    // moveMouse(): void {
+    //   this.wheelDrag.time = new Date().getTime();
+    //   if (this.wheelDrag.timer > 0) {
+    //     window.clearTimeout(this.wheelDrag.timer);
+    //     this.wheelDrag.timer = -1;
+    //   }
+
+    //   const angle = Math.abs((this.wheel.hueAngle + (this.wheelDrag.colorName == "comp" ? 180 : 0)) % 360);
+    //   this.wheel.splitAngle = Math.max(this.wheel.minSplit, Math.min(this.wheel.maxSplit, angle));
+
+    //   console.log("Angle:" + angle + " SplitAngle:" + this.wheel.splitAngle);
+    //   this.calculateWheel();
+    // },
     clearWheelTimeout() {
       if (this.wheel.timeout != null) {
         clearTimeout(this.wheel.timeout);
@@ -604,7 +701,7 @@ export default defineComponent({
       this.state.currentColor = this.colors[key].hslColor
     },
     blockWheelClick(blocked: boolean): void {
-      this.wheel.blockClick = blocked;
+      this.wheel.blockClick = this.wheelDrag.inDrag || blocked;
     }
 
   }
@@ -705,7 +802,7 @@ $wheelPad: 1.4vw;
             line-height: $vwFontBase;
             font-size: 0.86 * $vwFontBase;
             text-align: center;
-            font-weight: 600;
+            font-weight: 700;
 
             &.white {
               color: white;

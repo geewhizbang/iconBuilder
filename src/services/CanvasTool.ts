@@ -68,7 +68,7 @@ class CanvasToolService {
 		if (typeof this.#data.ctx !== "undefined") {
 			return this.#data.ctx as CanvasRenderingContext2D;
 		} else {
-			this.#data.ctx = (this.#data.canvasEl as HTMLCanvasElement).getContext("2d") as CanvasRenderingContext2D;
+			this.#data.ctx = (this.#data.canvasEl as HTMLCanvasElement).getContext("2d", {willReadFrequently: true}) as CanvasRenderingContext2D;
 			return this.#data.ctx;
 		}
 	}

@@ -168,10 +168,10 @@ export default defineComponent({
 
 .editorPane {
   position: absolute;
-  top: $sizeHeaderHeight;
+  top: 0;
   left: 0;
   right: 0;
-  bottom: $sizeFooterHeight;
+  bottom: 0;
 
   .rulerHorz {
     position: absolute;

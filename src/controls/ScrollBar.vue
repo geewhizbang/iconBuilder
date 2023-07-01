@@ -12,28 +12,31 @@
           />
         </div>
       </div>
-      <div
-        class="upButton"
-        ref="upButton"
-        v-if="!hideUp"
-        v-on:click="scrollClick(true)"
-      ></div>
+      <div class="upButton" ref="upButton" v-if="!hideUp" v-on:click="scrollClick(true)">
+        <IconArrow :rotation="buttonTopDir"></IconArrow>
+      </div>
       <div
         class="downButton"
         ref="downButton"
         v-if="!hideDown"
         v-on:click="scrollClick(false)"
-      ></div>
+      >
+        <IconArrow :rotation="buttonBottomDir"></IconArrow>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { ScrollData } from "@/types/global";
+import IconArrow from "../icons/IconArrow.vue";
 import { StyleValue, defineComponent, inject, ref } from "vue";
 
 export default defineComponent({
   name: "ScrollBar",
+  components: {
+    IconArrow,
+  },
   setup(props) {
     return {
       state: ref({
@@ -77,6 +80,12 @@ export default defineComponent({
     this.state.maxPosition = this.getScrollLength();
   },
   computed: {
+    buttonTopDir(): string {
+      return this.isVert ? "up" : "left";
+    },
+    buttonBottomDir(): string {
+      return this.isVert ? "down" : "right";
+    },
     hideUp() {
       return this.state.inDrag || this.state.hideUp;
     },
@@ -89,13 +98,11 @@ export default defineComponent({
         buttonStyle = {
           top: this.scrollData.scrollY * this.scrollData.scale + "px",
           height: this.scrollData.drawingPane.height * this.scrollData.scale + "px",
-          width: "100%",
         };
       } else {
         buttonStyle = {
           left: this.scrollData.scrollX * this.scrollData.scale + "px",
           width: this.scrollData.drawingPane.width * this.scrollData.scale + "px",
-          height: "100%",
         };
       }
 
