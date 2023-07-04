@@ -13,7 +13,7 @@
         </div>
       </div>
       <div class="upButton" ref="upButton" v-if="!hideUp" v-on:click="scrollClick(true)">
-        <IconArrow :rotation="buttonTopDir"></IconArrow>
+        <IconArrow :rotation="buttonTopDir" :disabled="false"></IconArrow>
       </div>
       <div
         class="downButton"
@@ -21,7 +21,7 @@
         v-if="!hideDown"
         v-on:click="scrollClick(false)"
       >
-        <IconArrow :rotation="buttonBottomDir"></IconArrow>
+        <IconArrow :rotation="buttonBottomDir" :disabled="false"></IconArrow>
       </div>
     </div>
   </div>

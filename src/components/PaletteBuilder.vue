@@ -156,26 +156,42 @@
                     <circle
                       :cx="wheel.a.x"
                       :cy="wheel.a.y"
+                      class="angle"
                       r="11"
                       :style="{ fill: colors.compA.color }"
+                      v-on:mouseenter="mouseEnter('compA')"
+                      v-on:mousedown="mouseDown"
+                      v-on:mouseup="mouseUp"
                     />
                     <circle
                       :cx="wheel.b.x"
                       :cy="wheel.b.y"
+                      class="angle"
                       r="11"
                       :style="{ fill: colors.compB.color }"
+                      v-on:mouseenter="mouseEnter('compB')"
+                      v-on:mousedown="mouseDown"
+                      v-on:mouseup="mouseUp"
                     />
                     <circle
+                      class="angle"
                       :cx="wheel.baseA.x"
                       :cy="wheel.baseA.y"
                       :style="{ fill: colors.baseA.color }"
                       r="11"
+                      v-on:mouseenter="mouseEnter('baseA')"
+                      v-on:mousedown="mouseDown"
+                      v-on:mouseup="mouseUp"
                     />
                     <circle
                       :cx="wheel.baseB.x"
                       :cy="wheel.baseB.y"
+                      class="angle"
                       r="11"
                       :style="{ fill: colors.baseB.color }"
+                      v-on:mouseenter="mouseEnter('baseB')"
+                      v-on:mousedown="mouseDown"
+                      v-on:mouseup="mouseUp"
                     />
                     <circle
                       :cx="wheel.comp.x"
@@ -249,6 +265,7 @@
       </AccordionControl>
     </div>
   </div>
+  <!-- <textarea class="debug" v-model="getDebug"></textarea> -->
 </template>
 
 <script lang="ts">
@@ -406,8 +423,6 @@ export default defineComponent({
     }
 
     const wheelDrag = {
-      startX: -1,
-      startY: -1,
       timer: -1,
       time: -1,
       inDrag: false,
@@ -448,6 +463,9 @@ export default defineComponent({
         '\n\nCanvasToolData = ' + CanvasTool.getData()
       );
     },
+    getDebug(): string {
+      return this.wheelDrag.angle + ' deg';
+    }
   },
   props: {
     template: {
@@ -465,87 +483,92 @@ export default defineComponent({
     window.removeEventListener("resize", this.initCanvas);
   },
   methods: {
-    // mouseDown(): Boolean {
-    //   this.wheelDrag.inDrag = true;
-    //   window.addEventListener("mousemove", this.mouseMove);
-    //   window.addEventListener("mouseup", this.mouseUp);
-    //   window.addEventListener("blur", this.mouseUp);
-    //   return false;
-    // },
-    // mouseMove(event: MouseEvent) {
-    //   if (this.wheelDrag.startY == -1) {
-    //     this.wheelDrag.startX = event.clientX;
-    //     this.wheelDrag.startY = event.clientY;
-    //   } else {
+    mouseDown(): Boolean {
+      this.wheelDrag.inDrag = true;
+      window.addEventListener("mousemove", this.mouseMove);
+      window.addEventListener("mouseup", this.mouseUp);
+      window.addEventListener("blur", this.mouseUp);
+      return false;
+    },
+    mouseMove(event: MouseEvent) {
 
-    //     let xD = event.clientX - this.wheelDrag.startX;
-    //     let yD = event.clientY - this.wheelDrag.startY;
+      const wheelRect = (this.$refs['canvasElement'] as HTMLCanvasElement).getBoundingClientRect();
+      const xCenter = wheelRect.left + wheelRect.width / 2;
+      const yCenter = wheelRect.top + wheelRect.height / 2;
+      const xD = event.clientX - xCenter;
+      const yD = event.clientY - yCenter;
 
-    //     const moveDistance = Math.sqrt((xD * xD) + (yD * yD));
-    //     if (moveDistance > 2) {
-    //       const wheelRect = (this.$refs['canvasElement'] as HTMLCanvasElement).getBoundingClientRect();
-    //       const xCenter = wheelRect.left + wheelRect.width / 2;
-    //       const yCenter = wheelRect.top + wheelRect.height / 2;
-    //       xD = event.clientX - xCenter;
-    //       yD = event.clientY - yCenter;
+      const xAbs = Math.abs(xD);
+      const yAbs = Math.abs(yD);
+      const calculatedAngle = (yAbs < 0.000001 ? Math.PI / 2 : Math.atan(xAbs / yAbs));
+      let angle = 0;
+      if (xD >= 0) {
+        if (yD <= 0) {
+          angle = calculatedAngle;
+        } else {
+          angle = Math.PI - calculatedAngle;
+        }
+      } else {
+        if (yD <= 0) {
+          angle = 2 * Math.PI - calculatedAngle;
+        } else {
+          angle = Math.PI + calculatedAngle;
+        }
+      }
 
-    //       const xAbs = Math.abs(xD);
-    //       const yAbs = Math.abs(yD);
-    //       const calculatedAngle = (yAbs < 0.000001 ? Math.PI / 2 : Math.atan(xAbs / yAbs));
-    //       let angle = 0;
-    //       if (xD >= 0) {
-    //         if (yD <= 0) {
-    //           angle = calculatedAngle;
-    //         } else {
-    //           angle = Math.PI - calculatedAngle;
-    //         }
-    //       } else {
-    //         if (yD <= 0) {
-    //           angle = 2 * Math.PI - calculatedAngle;
-    //         } else {
-    //           angle = Math.PI + calculatedAngle;
-    //         }
-    //       }
+      this.wheelDrag.angle = angle / Math.PI * 180;
+      console.log("wheelDrag.angle: " + this.wheelDrag.angle)
 
-    //       this.wheelDrag.angle = angle / Math.PI * 180;
+      let time = new Date().getTime();
+      if (time > this.wheelDrag.time + this.wheelDrag.debounce && this.wheelDrag.timer > 0) {
+        this.moveMouse();
+      } else {
+        this.wheelDrag.timer = window.setTimeout(() => {
+          this.moveMouse();
+        }, this.wheelDrag.debounce);
+      }
 
-    //       let time = new Date().getTime();
-    //       if (time > this.wheelDrag.time + this.wheelDrag.debounce && this.wheelDrag.timer > 0) {
-    //         this.moveMouse();
-    //       } else {
-    //         this.wheelDrag.timer = window.setTimeout(() => {
-    //           this.moveMouse();
-    //         }, this.wheelDrag.debounce);
-    //       }
-    //     }
-    //   }
-    //   return false;
-    // },
-    // mouseEnter(colorName: string) : void {
-    //   this.wheelDrag.inDrag = true;
-    //   this.wheelDrag.colorName = colorName;
-    // },
-    // mouseUp() {
-    //   this.wheelDrag.inDrag = false;
-    //   this.moveMouse();
-    //   this.wheelDrag.startX = -1;
-    //   this.wheelDrag.startY = -1;
-    //   window.removeEventListener("mousemove", this.mouseMove);
-    //   window.removeEventListener("mouseup", this.mouseUp);
-    // },
-    // moveMouse(): void {
-    //   this.wheelDrag.time = new Date().getTime();
-    //   if (this.wheelDrag.timer > 0) {
-    //     window.clearTimeout(this.wheelDrag.timer);
-    //     this.wheelDrag.timer = -1;
-    //   }
+      return false;
+    },
+    mouseEnter(colorName: string) : void {
+      this.wheelDrag.inDrag = true;
+      this.wheelDrag.colorName = colorName;
+    },
+    mouseUp() {
+      this.moveMouse();
+      window.removeEventListener("mousemove", this.mouseMove);
+      window.removeEventListener("mouseup", this.mouseUp);
+      setTimeout(() =>{
+        this.wheelDrag.inDrag = false;
+        this.wheel.blockClick = false;
+      }, 500);
+    },
+    moveMouse(): void {
+      this.wheelDrag.time = new Date().getTime();
+      if (this.wheelDrag.timer > 0) {
+        window.clearTimeout(this.wheelDrag.timer);
+        this.wheelDrag.timer = -1;
+      }
 
-    //   const angle = Math.abs((this.wheel.hueAngle + (this.wheelDrag.colorName == "comp" ? 180 : 0)) % 360);
-    //   this.wheel.splitAngle = Math.max(this.wheel.minSplit, Math.min(this.wheel.maxSplit, angle));
+      let angle = -1;
+      switch (this.wheelDrag.colorName) {
 
-    //   console.log("Angle:" + angle + " SplitAngle:" + this.wheel.splitAngle);
-    //   this.calculateWheel();
-    // },
+        case "compA":
+        case "compB":
+          angle = (this.wheel.hueAngle - 180) - this.wheelDrag.angle;
+          break;
+
+        case "baseA":
+        case "baseB":
+        angle = this.wheel.hueAngle - this.wheelDrag.angle;
+          break;
+      }
+      angle = Math.abs(angle % 360);
+      console.log("calculated splitAngle: " + angle);
+
+      this.wheel.splitAngle = Math.max(this.wheel.minSplit, Math.min(this.wheel.maxSplit, angle));
+      this.calculateWheel();
+    },
     clearWheelTimeout() {
       if (this.wheel.timeout != null) {
         clearTimeout(this.wheel.timeout);
@@ -586,7 +609,6 @@ export default defineComponent({
       return false
     },
     buildColors(hslColor: HslColor): void {
-      console.log(JSON.stringify(hslColor, null, '  '));
       this.colors.base.hslColor = hslColor
       this.colors.base.color = ColorConverter.RGBtoString(ColorConverter.HslToRgb(hslColor))
       this.colors.comp.hslColor = ColorConverter.GetHslOffsetColor(hslColor, 180)
@@ -707,7 +729,7 @@ export default defineComponent({
   }
 })
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 @import "../styles/_variables.scss";
 
 $boxSize: 5.95vw;
@@ -922,6 +944,7 @@ $wheelPad: 1.4vw;
         width: 100%;
         height: 100%;
         overflow: visible;
+        user-select: none;
 
         * {
           stroke: none;
@@ -954,6 +977,10 @@ $wheelPad: 1.4vw;
           fill: $colorGrayMedium;
           stroke-width: 1px;
           stroke: white;
+        }
+
+        .angle:hover {
+          cursor: pointer;
         }
 
         .ab {
