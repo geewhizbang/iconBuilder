@@ -427,7 +427,7 @@ export default defineComponent({
       time: -1,
       inDrag: false,
       debounce: 10,
-      angle: -1,
+      splitAngle: -1,
       colorName: "",
     };
 
@@ -516,8 +516,27 @@ export default defineComponent({
         }
       }
 
-      this.wheelDrag.angle = angle / Math.PI * 180;
-      console.log("wheelDrag.angle: " + this.wheelDrag.angle)
+      let newAngle = angle / Math.PI * 180;
+
+      switch (this.wheelDrag.colorName) {
+
+        case "compA":
+        case "compB":
+          angle = (this.wheel.hueAngle - 180) - newAngle
+          break;
+
+        case "baseA":
+        case "baseB":
+        angle = this.wheel.hueAngle - newAngle
+          break;
+      }
+      newAngle = Math.abs(angle % 360);
+
+      this.wheelDrag.splitAngle = Math.max(this.wheel.minSplit, Math.min(this.wheel.maxSplit, newAngle));
+      if (newAngle !== this.wheelDrag.splitAngle) {
+        this.mouseUp();
+        return false;
+      }
 
       let time = new Date().getTime();
       if (time > this.wheelDrag.time + this.wheelDrag.debounce && this.wheelDrag.timer > 0) {
@@ -541,7 +560,7 @@ export default defineComponent({
       setTimeout(() =>{
         this.wheelDrag.inDrag = false;
         this.wheel.blockClick = false;
-      }, 500);
+      }, 200);
     },
     moveMouse(): void {
       this.wheelDrag.time = new Date().getTime();
@@ -549,24 +568,7 @@ export default defineComponent({
         window.clearTimeout(this.wheelDrag.timer);
         this.wheelDrag.timer = -1;
       }
-
-      let angle = -1;
-      switch (this.wheelDrag.colorName) {
-
-        case "compA":
-        case "compB":
-          angle = (this.wheel.hueAngle - 180) - this.wheelDrag.angle;
-          break;
-
-        case "baseA":
-        case "baseB":
-        angle = this.wheel.hueAngle - this.wheelDrag.angle;
-          break;
-      }
-      angle = Math.abs(angle % 360);
-      console.log("calculated splitAngle: " + angle);
-
-      this.wheel.splitAngle = Math.max(this.wheel.minSplit, Math.min(this.wheel.maxSplit, angle));
+      this.wheel.splitAngle = this.wheelDrag.splitAngle;
       this.calculateWheel();
     },
     clearWheelTimeout() {
@@ -598,7 +600,7 @@ export default defineComponent({
       this.wheel.baseB = this.getWheelPos((angleB + 180) % 360, false);
     },
     wheelClick(event: MouseEvent): boolean {
-      if (this.wheel.blockClick) {
+      if (this.wheel.blockClick || this.wheelDrag.inDrag) {
         return false;;
       }
       let canvas = this.$refs['canvasElement'] as HTMLCanvasElement;
