@@ -72,15 +72,12 @@
                     :width="wheel.size"
                     :height="wheel.size"
                     ref="canvasElement"
-                    v-on:click="wheelClick"
                   ></canvas>
                 </div>
-                <div class="wheelInterface" v-on:click="wheelClick">
+                <div class="wheelInterface">
                   <svg ref="wheelInterface" viewBox="0 0 400 400">
                     <path
                       class="overlay"
-                      v-on:mouseenter="blockWheelClick(true)"
-                      v-on:mouseleave="blockWheelClick(false)"
                       d="M0 0l400 0 0 400 -400 0 0 -400zm200 7c107,0 193,86 193,193 0,107 -86,193 -193,193 -107,0 -193,-86 -193,-193 0,-107 86,-193 193,-193zm0 42c83,0 151,67 151,151 0,83 -67,151 -151,151 -83,0 -151,-67 -151,-151 0,-83 67,-151 151,-151z"
                     ></path>
                     <circle
@@ -150,8 +147,12 @@
                     <circle
                       :cx="wheel.base.x"
                       :cy="wheel.base.y"
+                      class="angle"
                       r="19"
                       :style="{ fill: colors.base.color }"
+                      v-on:mouseenter="mouseEnter('base')"
+                      v-on:mousedown="mouseDown"
+                      v-on:mouseup="mouseUp"
                     />
                     <circle
                       :cx="wheel.a.x"
@@ -307,7 +308,6 @@ interface Wheel {
   innerRadius: number,
   outerRadius: number,
   tileSize: number,
-  blockClick: boolean,
   timeout: NodeJS.Timeout | null,
   minSplit: number,
   maxSplit: number,
@@ -417,17 +417,19 @@ export default defineComponent({
       innerRadius: 0.73,
       outerRadius: 1,
       tileSize: 20,
-      blockClick: false,
       minSplit: 10,
-      maxSplit: 30,
+      maxSplit: 60,
     }
 
     const wheelDrag = {
       timer: -1,
       time: -1,
+      colorTime: -1,
       inDrag: false,
       debounce: 10,
+      colorDebounce: 500,
       splitAngle: -1,
+      hueAngle: -1,
       colorName: "",
     };
 
@@ -463,9 +465,6 @@ export default defineComponent({
         '\n\nCanvasToolData = ' + CanvasTool.getData()
       );
     },
-    getDebug(): string {
-      return this.wheelDrag.angle + ' deg';
-    }
   },
   props: {
     template: {
@@ -474,7 +473,7 @@ export default defineComponent({
     }
   },
   mounted() {
-    this.buildColors({ h: this.wheel.hueAngle / 360, s: this.wheel.s, l: this.wheel.l });
+    this.buildColors();
     this.initCanvas();
     this.calculateWheel();
     window.addEventListener("resize", this.initCanvas);
@@ -485,10 +484,27 @@ export default defineComponent({
   methods: {
     mouseDown(): Boolean {
       this.wheelDrag.inDrag = true;
+      this.wheelDrag.time = new Date().getTime();
+      this.wheelDrag.colorTime = this.wheelDrag.time;
+      this.wheelDrag.splitAngle = this.wheel.splitAngle;
+      this.wheelDrag.hueAngle = this.wheel.hueAngle;
       window.addEventListener("mousemove", this.mouseMove);
       window.addEventListener("mouseup", this.mouseUp);
       window.addEventListener("blur", this.mouseUp);
       return false;
+    },
+    modalAngle(x: number) {
+      while (x < 0) {
+        x+= 360;
+      }
+      return x % 360;
+    },
+    calculateAngle(xD: number, yD: number): number {
+      let angle = (Math.abs(xD) < 0.000000001 ? 0 : Math.atan(xD / yD));
+      if (yD >= 0) {
+        angle += Math.PI;
+      }
+      return angle / Math.PI * 180;
     },
     mouseMove(event: MouseEvent) {
 
@@ -498,48 +514,28 @@ export default defineComponent({
       const xD = event.clientX - xCenter;
       const yD = event.clientY - yCenter;
 
-      const xAbs = Math.abs(xD);
-      const yAbs = Math.abs(yD);
-      const calculatedAngle = (yAbs < 0.000001 ? Math.PI / 2 : Math.atan(xAbs / yAbs));
-      let angle = 0;
-      if (xD >= 0) {
-        if (yD <= 0) {
-          angle = calculatedAngle;
-        } else {
-          angle = Math.PI - calculatedAngle;
-        }
-      } else {
-        if (yD <= 0) {
-          angle = 2 * Math.PI - calculatedAngle;
-        } else {
-          angle = Math.PI + calculatedAngle;
-        }
-      }
-
-      let newAngle = angle / Math.PI * 180;
+      const newAngle = this.calculateAngle(xD, yD);
+      console.log(JSON.stringify({ xC: xCenter, yC: yCenter, xD: xD, yD: yD, newAngle: newAngle}, null, '  '));
 
       switch (this.wheelDrag.colorName) {
 
         case "compA":
         case "compB":
-          angle = (this.wheel.hueAngle - 180) - newAngle
+          this.setWheelDragSplitAngle(this.modalAngle( Math.abs((this.wheel.hueAngle - 180) - newAngle)));
           break;
 
         case "baseA":
         case "baseB":
-        angle = this.wheel.hueAngle - newAngle
+          this.setWheelDragSplitAngle(this.modalAngle(Math.abs(this.wheel.hueAngle - newAngle)));
           break;
-      }
-      newAngle = Math.abs(angle % 360);
 
-      this.wheelDrag.splitAngle = Math.max(this.wheel.minSplit, Math.min(this.wheel.maxSplit, newAngle));
-      if (newAngle !== this.wheelDrag.splitAngle) {
-        this.mouseUp();
-        return false;
+        case "base":
+          this.wheelDrag.hueAngle = newAngle;
+          break;
       }
 
       let time = new Date().getTime();
-      if (time > this.wheelDrag.time + this.wheelDrag.debounce && this.wheelDrag.timer > 0) {
+      if (time > this.wheelDrag.time + this.wheelDrag.debounce) {
         this.moveMouse();
       } else {
         this.wheelDrag.timer = window.setTimeout(() => {
@@ -547,11 +543,20 @@ export default defineComponent({
         }, this.wheelDrag.debounce);
       }
 
+      if (time > this.wheelDrag.colorTime + this.wheelDrag.colorDebounce) {
+        this.colors.base.hslColor.h = this.wheel.hueAngle / 360;
+        this.buildColors();
+      }
+
       return false;
     },
+    setWheelDragSplitAngle(newAngle : number) {
+      this.wheelDrag.splitAngle = Math.max(this.wheel.minSplit, Math.min(this.wheel.maxSplit, newAngle));
+    },
     mouseEnter(colorName: string) : void {
-      this.wheelDrag.inDrag = true;
-      this.wheelDrag.colorName = colorName;
+      if (!this.wheelDrag.inDrag) {
+        this.wheelDrag.colorName = colorName;
+      }
     },
     mouseUp() {
       this.moveMouse();
@@ -559,7 +564,7 @@ export default defineComponent({
       window.removeEventListener("mouseup", this.mouseUp);
       setTimeout(() =>{
         this.wheelDrag.inDrag = false;
-        this.wheel.blockClick = false;
+        this.buildColors();
       }, 200);
     },
     moveMouse(): void {
@@ -569,6 +574,7 @@ export default defineComponent({
         this.wheelDrag.timer = -1;
       }
       this.wheel.splitAngle = this.wheelDrag.splitAngle;
+      this.wheel.hueAngle = this.wheelDrag.hueAngle;
       this.calculateWheel();
     },
     clearWheelTimeout() {
@@ -588,30 +594,19 @@ export default defineComponent({
       }, 100);
     },
     calculateWheel(): void {
-      const angle = 360 - this.colors.base.hslColor.h * 360;
+      const angle = this.wheel.hueAngle;
       this.wheel.base = this.getWheelPos((angle + 180) % 360, true);
       const splitAngle = angle % 360;
       this.wheel.comp = this.getWheelPos(splitAngle, false);
-      const angleA = splitAngle - this.wheel.splitAngle;
-      const angleB = splitAngle + this.wheel.splitAngle;
+      const angleA = splitAngle + this.wheel.splitAngle;
+      const angleB = splitAngle - this.wheel.splitAngle;
       this.wheel.a = this.getWheelPos(angleA, false);
       this.wheel.b = this.getWheelPos(angleB, false);
       this.wheel.baseA = this.getWheelPos((angleA + 180) % 360, false);
       this.wheel.baseB = this.getWheelPos((angleB + 180) % 360, false);
     },
-    wheelClick(event: MouseEvent): boolean {
-      if (this.wheel.blockClick || this.wheelDrag.inDrag) {
-        return false;;
-      }
-      let canvas = this.$refs['canvasElement'] as HTMLCanvasElement;
-      const rect = canvas.getBoundingClientRect();
-      const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-      const color = ctx.getImageData(event.pageX - rect.x, event.pageY - rect.y, 1, 1).data;
-      this.buildColors(ColorConverter.RgbToHSL({ r: color[0], g: color[1], b: color[2] }));
-      return false
-    },
-    buildColors(hslColor: HslColor): void {
-      this.colors.base.hslColor = hslColor
+    buildColors(): void {
+      const hslColor = this.colors.base.hslColor;
       this.colors.base.color = ColorConverter.RGBtoString(ColorConverter.HslToRgb(hslColor))
       this.colors.comp.hslColor = ColorConverter.GetHslOffsetColor(hslColor, 180)
       this.colors.comp.color = ColorConverter.RGBtoString(
@@ -717,16 +712,15 @@ export default defineComponent({
 
       this.state.definedColors[this.state.currentColorKey] = true
       this.colors.base.hslColor = { h: this.wheel.hueAngle / 360, s: this.wheel.s, l: this.wheel.l } as HslColor;
-      this.buildColors(this.colors.base.hslColor);
-      this.calculateWheel();
+      this.buildColors();
     },
     editColor(key: string) {
       this.state.currentColorKey = key
       this.state.currentColor = this.colors[key].hslColor
     },
-    blockWheelClick(blocked: boolean): void {
-      this.wheel.blockClick = this.wheelDrag.inDrag || blocked;
-    }
+    // blockWheelClick(blocked: boolean): void {
+    //   this.wheel.blockClick = this.wheelDrag.inDrag || blocked;
+    // }
 
   }
 })

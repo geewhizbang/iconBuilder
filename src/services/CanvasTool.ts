@@ -1,4 +1,4 @@
-import type { HslColor, RgbColor } from "@/types/global";
+import type { HslColor } from "@/types/global";
 import { ColorConverter } from "./ColorConverter";
 
 interface CanvasToolImage {
@@ -50,7 +50,7 @@ class CanvasToolService {
 		
     const canvasRect: DOMRect = canvasEl.getBoundingClientRect();
 		this.#data.canvasEl = canvasEl;
-    this.#data.ctx = (this.#data.canvasEl as HTMLCanvasElement).getContext("2d") as CanvasRenderingContext2D;
+    this.#data.ctx = (this.#data.canvasEl as HTMLCanvasElement).getContext("2d", {willReadFrequently: true}) as CanvasRenderingContext2D;
     this.#data.centerX = Math.floor(canvasRect.width / 2);
     this.#data.centerY = Math.floor(canvasRect.height / 2);
     this.#data.innerRadius = Math.floor(innerRadius * canvasRect.height / 2);
@@ -85,6 +85,7 @@ class CanvasToolService {
     try {
       const tileCountX = Math.ceil(this.#data.width / this.#data.tileSize);
       const tileCountY = Math.ceil(this.#data.height / this.#data.tileSize);
+
       for (let x = 0; x < tileCountX; x++) {
         for (let y = 0; y < tileCountY; y++) {
 
@@ -129,33 +130,21 @@ class CanvasToolService {
       
       this.#data.s = s;
       this.#data.l = l;
+
+      for (let q = 0; q < this.#data.images.length; q++) {
       
-      this.#data.images.forEach( image => {
+        const image = this.#data.images[q];
 
         for (let x = 0; x < this.#data.tileSize; x++) {
           for (let y = 0; y < this.#data.tileSize; y++) {
             const xD = image.x + x - this.#data.centerX;
             const yD = image.y + y - this.#data.centerY;
             
-            const xAbs = Math.abs(xD);
-            const yAbs = Math.abs(yD);
-
             const radius = Math.sqrt((xD * xD) + (yD * yD));
             if (radius < this.#data.outerRadius && radius > this.#data.innerRadius) {
-              const calculatedAngle = (yAbs < 0.000001 ? Math.PI / 2 : Math.atan(xAbs / yAbs));
-              let angle = 0;
-              if (xD >= 0) {
-                if (yD <= 0) {
-                  angle = calculatedAngle;
-                } else {
-                  angle = Math.PI - calculatedAngle;
-                }
-              } else {
-                if (yD <= 0) {
-                  angle = 2 * Math.PI - calculatedAngle;
-                } else {
-                  angle = Math.PI + calculatedAngle;
-                }
+              let angle = (Math.abs(xD) < 0.000000001 ? 0 : Math.atan(xD / yD));
+              if (yD >= 0) {
+                angle += Math.PI;
               }
             
               const hslColor = { h: angle / Math.PI / 2, s: this.#data.s, l: this.#data.l } as HslColor
@@ -172,7 +161,7 @@ class CanvasToolService {
 
         this.#getCtx().putImageData(image.image, image.x, image.y);
 
-      });
+      }
       this.#data.rendering = false;
       if (this.#data.timeout != null) {
         clearTimeout(this.#data.timeout);
