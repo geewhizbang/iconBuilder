@@ -1,13 +1,18 @@
 <template>
   <div class="paletteBuilder">
-    <div class="templateColors">
+    <div class="templateColors" role="list">
       <div v-for="(color, key) in colors" :key="key" class="colorGroup">
         <div class="parent">
-          <div class="colorSwatch" v-on:click="editColor(key.toString())">
+          <div
+            class="colorSwatch"
+            v-on:click="editColor(key.toString())"
+            role="button"
+            aria-label="Edit Color"
+          >
             <div :style="{ background: color.color }">
-              <label class="label" :class="{ white: color.hslColor.l < 0.45 }">{{
-                color.name
-              }}</label>
+              <label class="label" :class="{ white: color.hslColor.l < 0.45 }">
+                {{ color.name }}<br />
+              </label>
             </div>
           </div>
         </div>
@@ -23,6 +28,8 @@
                 }"
                 class="colorSwatch"
                 v-on:click="editColor(key + '.' + index)"
+                role="button"
+                aria-label="Edit Color"
               >
                 <div :style="{ background: childColor.color }">
                   <label class="label">{{ childColor.name }}</label>
@@ -41,6 +48,8 @@
                 }"
                 class="colorSwatch"
                 v-on:click="editColor(key + '.' + index)"
+                role="button"
+                aria-label="Edit Color"
               >
                 <div :style="{ background: childColor.color }">
                   <label class="label">{{ childColor.name }}</label>
@@ -51,6 +60,7 @@
         </div>
       </div>
     </div>
+
     <div class="sidePanel useVw">
       <AccordionControl
         :config="{
@@ -59,23 +69,30 @@
           colorSelector: { open: false, disabled: true },
         }"
       >
-        <AccordionPane panelName="colorWheel">
+        <AccordionPane panelName="colorWheel" aria-label="Create Color Scheme">
           <template v-slot:header>
             <h2>Create Color Scheme</h2>
           </template>
           <template v-slot:content>
             <div class="accordionContents">
-              <label>Click wheel to select Base Color</label>
+              <label>Drag handles to select colors</label>
               <div class="wheelContainer">
                 <div class="wheelInterface">
                   <canvas
                     :width="wheel.size"
                     :height="wheel.size"
                     ref="canvasElement"
+                    aria-label="Color Wheel"
+                    role="img"
                   ></canvas>
                 </div>
                 <div class="wheelInterface">
-                  <svg ref="wheelInterface" viewBox="0 0 400 400">
+                  <svg
+                    ref="wheelInterface"
+                    viewBox="0 0 400 400"
+                    aria-label="Color Wheel SVG"
+                    role="img"
+                  >
                     <path
                       class="overlay"
                       d="M0 0l400 0 0 400 -400 0 0 -400zm200 7c107,0 193,86 193,193 0,107 -86,193 -193,193 -107,0 -193,-86 -193,-193 0,-107 86,-193 193,-193zm0 42c83,0 151,67 151,151 0,83 -67,151 -151,151 -83,0 -151,-67 -151,-151 0,-83 67,-151 151,-151z"
@@ -220,6 +237,7 @@
                 name="wheelS"
                 :showValue="true"
                 :useVw="true"
+                aria-label="Wheel Saturation"
               />
               <ValueScroller
                 :model-value="wheel.l"
@@ -230,6 +248,7 @@
                 name="wheelL"
                 :showValue="true"
                 :useVw="true"
+                aria-label="Wheel Lightness"
               />
               <ValueScroller
                 :model-value="wheel.splitAngle"
@@ -240,6 +259,7 @@
                 name="wheelSplitAngle"
                 :showValue="true"
                 :useVw="true"
+                aria-label="Split Angle"
               />
             </div>
           </template>
@@ -500,10 +520,7 @@ export default defineComponent({
       return x % 360;
     },
     calculateAngle(xD: number, yD: number): number {
-      let angle = (Math.abs(xD) < 0.000000001 ? 0 : Math.atan(xD / yD));
-      if (yD >= 0) {
-        angle += Math.PI;
-      }
+      let angle = Math.atan2(yD, xD);
       return angle / Math.PI * 180;
     },
     mouseMove(event: MouseEvent) {
@@ -595,15 +612,12 @@ export default defineComponent({
     },
     calculateWheel(): void {
       const angle = this.wheel.hueAngle;
-      this.wheel.base = this.getWheelPos((angle + 180) % 360, true);
-      const splitAngle = angle % 360;
-      this.wheel.comp = this.getWheelPos(splitAngle, false);
-      const angleA = splitAngle + this.wheel.splitAngle;
-      const angleB = splitAngle - this.wheel.splitAngle;
-      this.wheel.a = this.getWheelPos(angleA, false);
-      this.wheel.b = this.getWheelPos(angleB, false);
-      this.wheel.baseA = this.getWheelPos((angleA + 180) % 360, false);
-      this.wheel.baseB = this.getWheelPos((angleB + 180) % 360, false);
+      this.wheel.base = this.getWheelPos(angle, true);
+      this.wheel.comp = this.getWheelPos((angle + 180) % 360, false);
+      this.wheel.baseA = this.getWheelPos((angle + this.wheel.splitAngle) % 360, false);
+      this.wheel.baseB = this.getWheelPos((angle - this.wheel.splitAngle) % 360, false);
+      this.wheel.a = this.getWheelPos((angle + this.wheel.splitAngle + 180) % 360, false);
+      this.wheel.b = this.getWheelPos((angle - this.wheel.splitAngle + 180) % 360, false);
     },
     buildColors(): void {
       const hslColor = this.colors.base.hslColor;
@@ -678,8 +692,8 @@ export default defineComponent({
       const radians = (angle / 180) * Math.PI
       const radius = this.wheel.center.y * (isBase ? 0.97 : 0.75);
       return {
-        x: Math.sin(radians) * radius + this.wheel.center.x,
-        y: Math.cos(radians) * radius + this.wheel.center.y
+        x: Math.cos(radians) * radius + this.wheel.center.x,
+        y: Math.sin(radians) * radius + this.wheel.center.y
       } as XY
     },
     hasColor(colorKey: string) {

@@ -50,7 +50,7 @@ class CanvasToolService {
 		
     const canvasRect: DOMRect = canvasEl.getBoundingClientRect();
 		this.#data.canvasEl = canvasEl;
-    this.#data.ctx = (this.#data.canvasEl as HTMLCanvasElement).getContext("2d", {willReadFrequently: true}) as CanvasRenderingContext2D;
+    this.#data.ctx = (this.#data.canvasEl as HTMLCanvasElement).getContext("2d") as CanvasRenderingContext2D;
     this.#data.centerX = Math.floor(canvasRect.width / 2);
     this.#data.centerY = Math.floor(canvasRect.height / 2);
     this.#data.innerRadius = Math.floor(innerRadius * canvasRect.height / 2);
@@ -68,7 +68,7 @@ class CanvasToolService {
 		if (typeof this.#data.ctx !== "undefined") {
 			return this.#data.ctx as CanvasRenderingContext2D;
 		} else {
-			this.#data.ctx = (this.#data.canvasEl as HTMLCanvasElement).getContext("2d", {willReadFrequently: true}) as CanvasRenderingContext2D;
+			this.#data.ctx = (this.#data.canvasEl as HTMLCanvasElement).getContext("2d") as CanvasRenderingContext2D;
 			return this.#data.ctx;
 		}
 	}
@@ -142,10 +142,7 @@ class CanvasToolService {
             
             const radius = Math.sqrt((xD * xD) + (yD * yD));
             if (radius < this.#data.outerRadius && radius > this.#data.innerRadius) {
-              let angle = (Math.abs(xD) < 0.000000001 ? 0 : Math.atan(xD / yD));
-              if (yD >= 0) {
-                angle += Math.PI;
-              }
+              const angle = Math.atan2(yD, xD);
             
               const hslColor = { h: angle / Math.PI / 2, s: this.#data.s, l: this.#data.l } as HslColor
               const color = ColorConverter.HslToRgb(hslColor);

@@ -1,16 +1,13 @@
 <script lang="ts">
-
-import { defineComponent } from 'vue';
+import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "ToggleButton",
-  emits: ['changeToggle'],
+  emits: ["changeToggle"],
   setup() {
-
     return {
       id: "",
     };
-
   },
   props: {
     modelValue: {
@@ -23,8 +20,8 @@ export default defineComponent({
     },
     buttonClass: {
       type: String,
-      default: ""
-    }
+      default: "",
+    },
   },
   computed: {
     getClass(): string {
@@ -35,41 +32,40 @@ export default defineComponent({
       if (this.buttonClass.length > 0) {
         result.push(this.buttonClass);
       }
-      return result.join(' ');
-    }
-  }
+      return result.join(" ");
+    },
+  },
 });
-
 </script>
 
 <template>
-  <div class="toggleButton" :class="getClass">
+  <div class="toggleButton" :class="getClass" aria-label="ToggleButton Component">
     <label v-if="label.length > 0">{{ label }}</label>
     <div>
-      <span></span>
+      <button></button>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
 @import "../styles/_variables.scss";
-  
-  .toggleButton {
-    width: $sizeToggleButtonWidth;
-    height: auto;
-    display: block;
-    overflow: hidden;
 
-    > div {
-      width: 100%;
-      height: $sizeToggleButtonHeight;
-      background: $colorToggleButtonOffBg;
-      border-radius: $sizeToggleButtonHeight * 0.5;
-      padding: 3px;
+.toggleButton {
+  width: $sizeToggleButtonWidth;
+  height: auto;
+  display: block;
+  overflow: hidden;
 
-      > span {
-        display: block;
-      }
+  > div {
+    width: 100%;
+    height: $sizeToggleButtonHeight;
+    background: $colorToggleButtonOffBg;
+    border-radius: $sizeToggleButtonHeight * 0.5;
+    padding: 3px;
+
+    > span {
+      display: block;
     }
   }
+}
 </style>
