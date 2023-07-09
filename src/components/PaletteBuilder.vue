@@ -12,6 +12,10 @@
             <div :style="{ background: color.color }">
               <label class="label" :class="{ white: color.hslColor.l < 0.45 }">
                 {{ color.name }}<br />
+                <!-- {{ Math.round(color.hslColor.h * 360) }}<br /> -->
+              </label>
+              <label class="hoverLabel">
+                Hue: {{ Math.round(color.hslColor.h * 100) / 100 }}
               </label>
             </div>
           </div>
@@ -32,7 +36,7 @@
                 aria-label="Edit Color"
               >
                 <div :style="{ background: childColor.color }">
-                  <label class="label">{{ childColor.name }}</label>
+                  <label class="hoverLabel">{{ childColor.name }}</label>
                 </div>
               </div>
             </div>
@@ -52,7 +56,7 @@
                 aria-label="Edit Color"
               >
                 <div :style="{ background: childColor.color }">
-                  <label class="label">{{ childColor.name }}</label>
+                  <label class="hoverLabel">{{ childColor.name }}</label>
                 </div>
               </div>
             </div>
@@ -113,6 +117,8 @@
                     <circle class="ab" :cx="wheel.b.x" :cy="wheel.b.y" r="14" />
                     <circle class="ab" :cx="wheel.baseA.x" :cy="wheel.baseA.y" r="14" />
                     <circle class="ab" :cx="wheel.baseB.x" :cy="wheel.baseB.y" r="14" />
+                    <circle class="ab" :cx="wheel.sideA.x" :cy="wheel.sideA.y" r="14" />
+                    <circle class="ab" :cx="wheel.sideB.x" :cy="wheel.sideB.y" r="14" />
                     <circle
                       class="outerCircle"
                       :cx="wheel.comp.x"
@@ -160,6 +166,13 @@
                       :y1="wheel.center.y"
                       :x2="wheel.baseB.x"
                       :y2="wheel.baseB.y"
+                    />
+                    <line
+                      class="lineAB"
+                      :x1="wheel.sideA.x"
+                      :y1="wheel.sideA.y"
+                      :x2="wheel.sideB.x"
+                      :y2="wheel.sideB.y"
                     />
                     <circle
                       :cx="wheel.base.x"
@@ -216,6 +229,18 @@
                       :cy="wheel.comp.y"
                       r="11"
                       :style="{ fill: colors.comp.color }"
+                    />
+                    <circle
+                      :cx="wheel.sideA.x"
+                      :cy="wheel.sideA.y"
+                      r="11"
+                      :style="{ fill: colors.sideA.color }"
+                    />
+                    <circle
+                      :cx="wheel.sideB.x"
+                      :cy="wheel.sideB.y"
+                      r="11"
+                      :style="{ fill: colors.sideB.color }"
                     />
                     <circle
                       class="centerTop"
@@ -286,7 +311,6 @@
       </AccordionControl>
     </div>
   </div>
-  <!-- <textarea class="debug" v-model="getDebug"></textarea> -->
 </template>
 
 <script lang="ts">
@@ -320,6 +344,8 @@ interface Wheel {
   b: XY;
   baseA: XY;
   baseB: XY;
+  sideA: XY;
+  sideB: XY;
   splitAngle: number;
   hueAngle: number;
   l: number,
@@ -397,6 +423,21 @@ export default defineComponent({
         sChildren: [],
         lChildren: [],
       },
+      sideA: {
+        name: 'Side A',
+        hslColor: { h: 0, s: 0, l: 1 },
+        color: '',
+        sChildren: [],
+        lChildren: [],
+      },
+      sideB: {
+        name: 'Side B',
+        hslColor: { h: 0, s: 0, l: 1 },
+        color: '',
+        sChildren: [],
+        lChildren: [],
+      },
+
     }
 
     const wheel: Wheel = {
@@ -428,6 +469,14 @@ export default defineComponent({
         x: 240,
         y: 370
       },
+      sideA: {
+        x: 40,
+        y: 270
+      },
+      sideB: {
+        x: 240,
+        y: 370
+      },
       size: 400,
       timeout: null,
       splitAngle: 20,
@@ -446,11 +495,12 @@ export default defineComponent({
       time: -1,
       colorTime: -1,
       inDrag: false,
-      debounce: 10,
-      colorDebounce: 500,
+      debounce: 5,
+      colorDebounce: 300,
       splitAngle: -1,
       hueAngle: -1,
       colorName: "",
+      newAngle: -1,
     };
 
     let definedColors: { [key: string]: boolean } = {}
@@ -521,7 +571,7 @@ export default defineComponent({
     },
     calculateAngle(xD: number, yD: number): number {
       let angle = Math.atan2(yD, xD);
-      return angle / Math.PI * 180;
+      return this.modalAngle(angle / Math.PI * 180);
     },
     mouseMove(event: MouseEvent) {
 
@@ -532,20 +582,22 @@ export default defineComponent({
       const yD = event.clientY - yCenter;
 
       const newAngle = this.calculateAngle(xD, yD);
-      console.log(JSON.stringify({ xC: xCenter, yC: yCenter, xD: xD, yD: yD, newAngle: newAngle}, null, '  '));
+      this.wheelDrag.newAngle = newAngle;
 
       switch (this.wheelDrag.colorName) {
 
         case "compA":
+          this.setWheelDragSplitAngle(this.modalAngle( newAngle - (this.wheel.hueAngle + 180)));
+          break;
         case "compB":
-          this.setWheelDragSplitAngle(this.modalAngle( Math.abs((this.wheel.hueAngle - 180) - newAngle)));
+          this.setWheelDragSplitAngle(this.modalAngle( this.wheel.hueAngle + 180 - newAngle));
           break;
-
         case "baseA":
-        case "baseB":
-          this.setWheelDragSplitAngle(this.modalAngle(Math.abs(this.wheel.hueAngle - newAngle)));
+          this.setWheelDragSplitAngle(this.modalAngle(newAngle - this.wheel.hueAngle));
           break;
-
+        case "baseB":
+          this.setWheelDragSplitAngle(this.modalAngle(this.wheel.hueAngle - newAngle));
+          break;
         case "base":
           this.wheelDrag.hueAngle = newAngle;
           break;
@@ -554,21 +606,17 @@ export default defineComponent({
       let time = new Date().getTime();
       if (time > this.wheelDrag.time + this.wheelDrag.debounce) {
         this.moveMouse();
-      } else {
-        this.wheelDrag.timer = window.setTimeout(() => {
-          this.moveMouse();
-        }, this.wheelDrag.debounce);
       }
 
       if (time > this.wheelDrag.colorTime + this.wheelDrag.colorDebounce) {
         this.colors.base.hslColor.h = this.wheel.hueAngle / 360;
         this.buildColors();
       }
-
       return false;
     },
     setWheelDragSplitAngle(newAngle : number) {
-      this.wheelDrag.splitAngle = Math.max(this.wheel.minSplit, Math.min(this.wheel.maxSplit, newAngle));
+      let angle = Math.max(this.wheel.minSplit, Math.min(this.wheel.maxSplit, newAngle));
+      this.wheelDrag.splitAngle = angle;
     },
     mouseEnter(colorName: string) : void {
       if (!this.wheelDrag.inDrag) {
@@ -615,41 +663,31 @@ export default defineComponent({
       this.wheel.base = this.getWheelPos(angle, true);
       this.wheel.comp = this.getWheelPos((angle + 180) % 360, false);
       this.wheel.baseA = this.getWheelPos((angle + this.wheel.splitAngle) % 360, false);
-      this.wheel.baseB = this.getWheelPos((angle - this.wheel.splitAngle) % 360, false);
+      this.wheel.baseB = this.getWheelPos((angle + 360 - this.wheel.splitAngle) % 360, false);
+      this.wheel.sideA = this.getWheelPos((angle + 90) % 360, false);
+      this.wheel.sideB = this.getWheelPos((angle + 360 - 90) % 360, false);
       this.wheel.a = this.getWheelPos((angle + this.wheel.splitAngle + 180) % 360, false);
       this.wheel.b = this.getWheelPos((angle - this.wheel.splitAngle + 180) % 360, false);
     },
     buildColors(): void {
       const hslColor = this.colors.base.hslColor;
-      this.colors.base.color = ColorConverter.RGBtoString(ColorConverter.HslToRgb(hslColor))
-      this.colors.comp.hslColor = ColorConverter.GetHslOffsetColor(hslColor, 180)
-      this.colors.comp.color = ColorConverter.RGBtoString(
-        ColorConverter.HslToRgb(this.colors.comp.hslColor)
-      );
-      this.colors.compA.hslColor = ColorConverter.GetHslOffsetColor(
-        this.colors.comp.hslColor,
-        this.wheel.splitAngle
-      );
-      this.colors.compA.color = ColorConverter.RGBtoString(
-        ColorConverter.HslToRgb(this.colors.compA.hslColor)
-      );
-      this.colors.baseA.hslColor = ColorConverter.GetHslOffsetColor(this.colors.compA.hslColor, 180);
-      this.colors.baseA.color = ColorConverter.RGBtoString(
-        ColorConverter.HslToRgb(this.colors.baseA.hslColor)
-      );
+      const colorProps = [
+        { prop: 'base', offset: 0 },
+        { prop: 'baseA', offset: this.wheel.splitAngle },
+        { prop: 'baseB', offset: -this.wheel.splitAngle },
+        { prop: 'comp', offset: 180 },
+        { prop: 'compA', offset: this.wheel.splitAngle + 180},
+        { prop: 'compB', offset: -this.wheel.splitAngle + 180},
+        { prop: 'sideA', offset: 90 },
+        { prop: 'sideB', offset: 180 + 90 }
+      ];
 
-      this.colors.compB.hslColor = ColorConverter.GetHslOffsetColor(
-        this.colors.comp.hslColor,
-        -this.wheel.splitAngle
-      );
-      this.colors.compB.color = ColorConverter.RGBtoString(
-        ColorConverter.HslToRgb(this.colors.compB.hslColor)
-      );
-
-      this.colors.baseB.hslColor = ColorConverter.GetHslOffsetColor(this.colors.compB.hslColor, 180);
-      this.colors.baseB.color = ColorConverter.RGBtoString(
-        ColorConverter.HslToRgb(this.colors.baseB.hslColor)
-      );
+      for (const colorProp of colorProps) {
+        this.colors[colorProp.prop].hslColor = ColorConverter.GetHslOffsetColor(hslColor, (360 + colorProp.offset) % 360);
+        this.colors[colorProp.prop].color = ColorConverter.RGBtoString(
+          ColorConverter.HslToRgb(this.colors[colorProp.prop].hslColor)
+        );
+      }
 
       this.wheel.hueAngle = this.colors.base.hslColor.h * 360;
       this.calculateWheel();
@@ -742,7 +780,8 @@ export default defineComponent({
 <style lang="scss" scoped>
 @import "../styles/_variables.scss";
 
-$boxSize: 5.95vw;
+$boxWidth: 5.95vw;
+$boxHeight: 4vw;
 $panelWidth: 21vw;
 $sizeLeftPanel: 18vw;
 $smallPad: 0.2vw;
@@ -791,25 +830,60 @@ $wheelPad: 1.4vw;
     .colorGroup {
       width: calc(100% - $medPad);
       padding: 0;
-      height: $boxSize + $rowMargin;
+      height: $boxHeight;
       display: flex;
       flex-direction: row;
-
-      * {
-        border: 1$medPad solid magenta;
-      }
+      align-items: stretch;
 
       .parent {
-        width: $boxSize + $horzSpacing;
+        width: $boxWidth;
         height: auto;
+        flex-grow: 1;
       }
 
       .colorSwatch {
-        width: $boxSize;
-        height: $boxSize;
-        border-radius: $vwFontBase * 0.9;
-        padding: $smallPad;
-        border: 1px solid transparent;
+        width: $boxWidth;
+        height: $boxHeight;
+        position: relative;
+
+        &::before {
+          content: "";
+          display: block;
+          position: absolute;
+          left: calc(50% - 0.2vw);
+          width: 0.4vw;
+          height: 0.4vw;
+          top: -0.3vw;
+          background: $colorGrayDark;
+          transform: rotate(45deg);
+          opacity: 0;
+          transition: all 0.5s;
+        }
+
+        .hoverLabel {
+          position: absolute;
+          top: -1vw;
+          height: auto;
+          border-radius: 0.2vw;
+          line-height: 0.3 * $vwFontBase;
+          padding: 0.35vw 0.5vw;
+          background: $colorGrayDark;
+          color: white;
+          opacity: 0;
+          transition: all 0.5s;
+          font-size: 0.85 * $vwFontBase;
+          display: block;
+        }
+
+        &:hover {
+          &::before {
+            opacity: 1;
+          }
+
+          .hoverLabel {
+            opacity: 1;
+          }
+        }
 
         &.selected {
           border: 1px solid $colorGray;
@@ -822,7 +896,6 @@ $wheelPad: 1.4vw;
         > div {
           width: 100%;
           height: 100%;
-          border-radius: $vwFontBase * 0.7;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -844,13 +917,15 @@ $wheelPad: 1.4vw;
       }
 
       > .children {
-        width: calc(100% - $boxSize);
+        width: calc(100% - $boxWidth);
         height: 100%;
         display: flex;
         flex-direction: column;
+        flex-grow: 12;
+        align-items: stretch;
 
         > .row {
-          height: $boxSize * 0.5;
+          height: $boxHeight * 0.5;
           width: 100%;
           display: flex;
           flex-direction: row;
@@ -862,6 +937,7 @@ $wheelPad: 1.4vw;
 
             > .colorSwatch {
               height: 100%;
+              flex-grow: 1;
 
               &::before {
                 content: "";
@@ -870,17 +946,17 @@ $wheelPad: 1.4vw;
                 left: calc(50% - 0.2vw);
                 width: 0.4vw;
                 height: 0.4vw;
-                top: -0.2vw;
+                top: -0.4vw;
                 background: $colorGrayDark;
                 transform: rotate(45deg);
                 opacity: 0;
                 transition: all 0.5s;
               }
 
-              label {
+              .hoverLabel {
                 position: absolute;
-                top: -0.9vw;
-                height: 0.95vw;
+                top: -1.1vw;
+                height: auto;
                 border-radius: 0.2vw;
                 line-height: 0.3 * $vwFontBase;
                 padding: 0.35vw 0.5vw;
@@ -888,6 +964,8 @@ $wheelPad: 1.4vw;
                 color: white;
                 opacity: 0;
                 transition: all 0.5s;
+                font-size: 0.85 * $vwFontBase;
+                display: block;
               }
 
               &:hover {
@@ -895,7 +973,7 @@ $wheelPad: 1.4vw;
                   opacity: 1;
                 }
 
-                label {
+                .hoverLabel {
                   opacity: 1;
                 }
               }
