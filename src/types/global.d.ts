@@ -48,6 +48,12 @@ export type HslColor = {
   [key in HslColorKeys]: number;
 }
 
+export type ModelColorKeys = | 'h' | 's' | 'lOrV';
+
+export type ModelColor = { 
+  [key in ModelColorKeys]: number;
+}
+
 export type HsvColorKeys = | 'h' | 's' | 'v';
 
 export type HsvColor = { 

@@ -136,18 +136,7 @@ class CanvasToolService {
             const radius = Math.sqrt((xD * xD) + (yD * yD));
             if (radius < this.#data.outerRadius && radius > this.#data.innerRadius) {
               const angle = Math.atan2(yD, xD);
-            
-              let color = {} as RgbColor;
-
-              if (hslMode) {
-                const hslColor = { h: angle / Math.PI / 2, s: s, l: lOrV } as HslColor
-                color = ColorConverter.HslToRgb(hslColor);
-              } else { 
-                const hsvColor = { h: ((angle / Math.PI * 180) + 360) % 360, s: s, v: lOrV } as HsvColor
-                // console.log("angle:" + (Math.round(angle * 100) / 100) + "h:" + hsvColor.h);
-                color = ColorConverter.HsvToRgb(hsvColor);
-                // console.log(JSON.stringify({hsvColor: hsvColor, color: color}, null, '  '))
-              }
+              const color = ColorConverter.ModelToRgb({ h: ((angle / Math.PI / 2) + 1) % 1, s: s, lOrV: lOrV }, hslMode);
               const index = y * 4 * this.#data.tileSize + x * 4;
               const imageData = image.image;
               imageData.data[index] = color.r;

@@ -83,11 +83,11 @@
               v-on:click="selectColor(['altColor', key])"
             >
               <div class="centerLabel">
-                <label class="label" :class="{ white: color.hslColor.l < 0.45 }">
+                <label class="label" :class="{ white: color.modelColor.lOrV < 0.45 }">
                   {{ color.name }}<br />
                 </label>
                 <label class="hoverLabel">
-                  Hue: {{ Math.round(color.hslColor.h * 100) / 100 }}
+                  Hue: {{ Math.round(color.modelColor.h * 100) / 100 }}
                 </label>
               </div>
             </div>
@@ -309,7 +309,7 @@
                           :cy="color.y"
                           r="15"
                           :style="{ fill: altColors[key].color }"
-                          v-on:mouseenter="altMouseEnter('')"
+                          v-on:mouseenter="altMouseEnter(key.toString())"
                           v-on:mousedown="mouseDown"
                           v-on:mouseup="mouseUp"
                         />
@@ -320,54 +320,28 @@
               </div>
             </div>
             <div class="wheelAdjust" v-if="wheel.templateMode">
-              <template v-if="state.hslMode">
-                <ValueScroller
-                  :model-value="wheel.hsl.s"
-                  :minValue="0.2"
-                  :maxValue="0.95"
-                  label="Saturation"
-                  v-on:change="change"
-                  name="wheelS"
-                  :showValue="true"
-                  :useVw="true"
-                  aria-label="Saturation"
-                />
-                <ValueScroller
-                  :model-value="wheel.hsl.l"
-                  :minValue="0.2"
-                  :maxValue="0.85"
-                  label="Lightness"
-                  v-on:change="change"
-                  name="wheelL"
-                  :showValue="true"
-                  :useVw="true"
-                  aria-label="Lightness"
-                />
-              </template>
-              <template v-else>
-                <ValueScroller
-                  :model-value="wheel.hsv.s"
-                  :minValue="0"
-                  :maxValue="1"
-                  label="Saturation"
-                  v-on:change="change"
-                  name="wheelS"
-                  :showValue="true"
-                  :useVw="true"
-                  aria-label="Saturation"
-                />
-                <ValueScroller
-                  :model-value="wheel.hsv.v"
-                  :minValue="0"
-                  :maxValue="1"
-                  label="Value"
-                  v-on:change="change"
-                  name="wheelV"
-                  :showValue="true"
-                  :useVw="true"
-                  aria-label="Value"
-                />
-              </template>
+              <ValueScroller
+                :model-value="wheel.s"
+                :minValue="0.2"
+                :maxValue="0.95"
+                label="Saturation"
+                v-on:change="change"
+                name="wheelS"
+                :showValue="true"
+                :useVw="true"
+                aria-label="Saturation"
+              />
+              <ValueScroller
+                :model-value="wheel.lOrV"
+                :minValue="0.2"
+                :maxValue="0.85"
+                :label="state.hslMode ? 'Lightness' : 'Value'"
+                v-on:change="change"
+                name="wheelLorV"
+                :showValue="true"
+                :useVw="true"
+                :aria-label="state.hslMode ? 'Lightness' : 'Value'"
+              />
               <ValueScroller
                 :model-value="wheel.splitAngle"
                 :minValue="wheel.minSplit"
@@ -381,54 +355,28 @@
               />
             </div>
             <div class="wheelAdjust" v-if="!wheel.templateMode">
-              <template v-if="state.hslMode">
-                <ValueScroller
-                  :model-value="altColors[state.selectedAltColor].hslColor.s"
-                  :minValue="0.2"
-                  :maxValue="0.95"
-                  label="Saturation"
-                  v-on:change="changeAlt"
-                  name="altS"
-                  :showValue="true"
-                  :useVw="true"
-                  aria-label="Saturation"
-                />
-                <ValueScroller
-                  :model-value="altColors[state.selectedAltColor].hslColor.l"
-                  :minValue="0.2"
-                  :maxValue="0.85"
-                  label="Lightness"
-                  v-on:change="changeAlt"
-                  name="altL"
-                  :showValue="true"
-                  :useVw="true"
-                  aria-label="Lightness"
-                />
-              </template>
-              <template v-else>
-                <ValueScroller
-                  :model-value="altColors[state.selectedAltColor].hsvColor.s"
-                  :minValue="0"
-                  :maxValue="1"
-                  label="Saturation"
-                  v-on:change="changeAlt"
-                  name="altS"
-                  :showValue="true"
-                  :useVw="true"
-                  aria-label="Saturation"
-                />
-                <ValueScroller
-                  :model-value="altColors[state.selectedAltColor].hsvColor.v"
-                  :minValue="0"
-                  :maxValue="1"
-                  label="Value"
-                  v-on:change="changeAlt"
-                  name="altV"
-                  :showValue="true"
-                  :useVw="true"
-                  aria-label="Value"
-                />
-              </template>
+              <ValueScroller
+                :model-value="altColors[state.selectedAltColor].modelColor.s"
+                :minValue="0.2"
+                :maxValue="0.95"
+                label="Saturation"
+                v-on:change="changeAlt"
+                name="altS"
+                :showValue="true"
+                :useVw="true"
+                aria-label="Saturation"
+              />
+              <ValueScroller
+                :model-value="altColors[state.selectedAltColor].modelColor.lOrV"
+                :minValue="0.2"
+                :maxValue="0.85"
+                :label="state.hslMode ? 'Lightness' : 'Value'"
+                v-on:change="changeAlt"
+                name="altLorV"
+                :showValue="true"
+                :useVw="true"
+                :aria-label="state.hslMode ? 'Lightness' : 'Value'"
+              />
             </div>
           </template>
         </AccordionPane>
@@ -455,8 +403,8 @@
     </div>
     <HeaderControl>
       <template v-slot:onLeft>
-        <p>{{ colors.base.hsvColor }}</p>
-        <p>{{ colors.base.hslColor }}</p>
+        <p>{{ wheelDrag.hoveredAltColor }}</p>
+        <p>{{ JSON.stringify(altColors, null, "  ") }}</p>
       </template>
       <template v-slot:onRight>
         <div class="stateButtons">
@@ -488,16 +436,15 @@ import AccordionPane from '../controls/AccordionPane.vue';
 import HeaderControl from '../controls/HeaderControl.vue';
 import StateSelector, { type ModeChange, type StateSelectorData } from '../controls/StateSelector.vue';
 
-import { ChangeValue, type HslColor, type HsvColor, type RgbColor } from '../types/global';
+import { ChangeValue, type ModelColor, type RgbColor } from '../types/global';
 
 // import axios from "axios";
 
 interface TemplateColor {
   name: string,
   label: string,
-  color: string
-  hslColor: HslColor,
-  hsvColor: HsvColor,
+  color: string,
+  modelColor: ModelColor,
 }
 
 interface XY {
@@ -516,16 +463,9 @@ interface Wheel {
   sideA: XY;
   sideB: XY;
   splitAngle: number;
-  hueAngleHsv: number;
-  hueAngleHsl: number;
-  hsl: {
-    l: number,
-    s: number,
-  },
-  hsv: {
-    v: number,
-    s: number,
-  },
+  hueAngle: number
+  lOrV: number;
+  s: number;
   size: number,
   innerRadius: number,
   outerRadius: number,
@@ -561,18 +501,16 @@ export default defineComponent({
 
   setup() {
 
-    const baseColorHsl = ColorConverter.RgbToHsl({ r: 33, g: 212, b: 235 } as RgbColor);
-    const baseColorHsv = ColorConverter.RgbToHsv({ r: 33, g: 212, b: 235 } as RgbColor);
+    const baseColorModel = ColorConverter.RgbToModel({ r: 33, g: 212, b: 235 } as RgbColor, true);
 
-    const red = { r: 255, g: 0, b: 0 };
+    const redColor = { r: 255, g: 0, b: 0 };
 
     const altColors: {[key: string]: TemplateColor } = {
       red: {
         name: 'Warning Color',
         label: "",
-        hslColor: ColorConverter.RgbToHsl(red),
-        hsvColor: ColorConverter.RgbToHsv(red),
-        color: ColorConverter.RGBtoString(red),
+        modelColor: ColorConverter.RgbToModel(redColor, true),
+        color: ColorConverter.RGBtoString(redColor),
       },
     }
 
@@ -593,16 +531,14 @@ export default defineComponent({
       colors[key] = {
         name: colorsMap[key],
         label: "",
-        hslColor: { h: 0.5, s: 0.5, l: 0.5 },
-        hsvColor: { h: 30, s: 0.5, v: 0.9},
+        modelColor: { h: 0.5, s: 0.5, lOrV: 0.5 },
         color: '',
         sChildren: [],
         lvChildren: [],
       };
     });
 
-    colors.base.hsvColor = baseColorHsv;
-    colors.base.hslColor = baseColorHsl;
+    colors.base.modelColor = baseColorModel;
 
     const altWheel: AltWheel = {};
 
@@ -611,16 +547,9 @@ export default defineComponent({
       size: 400,
       timeout: null,
       splitAngle: 20,
-      hueAngleHsl: baseColorHsl.h * 360,
-      hueAngleHsv: baseColorHsv.h,
-      hsl: {
-        l: baseColorHsl.l,
-        s: baseColorHsl.s,
-      },
-      hsv: {
-        v: baseColorHsv.v,
-        s: baseColorHsv.s,
-      },
+      hueAngle: baseColorModel.h * 360,
+      lOrV: 0.5,
+      s: 0.5,
       innerRadius: 0.748,
       outerRadius: 0.975,
       tileSize: 20,
@@ -649,6 +578,7 @@ export default defineComponent({
       colorName: "",
       newAngle: -1,
       altKey: '',
+      hoveredAltColor: '',
     };
 
     const colorState: StateSelectorData = {
@@ -701,8 +631,7 @@ export default defineComponent({
     }
   },
   mounted() {
-    this.wheel.hueAngleHsl = this.colors.base.hslColor.h * 360
-    this.wheel.hueAngleHsv = this.colors.base.hsvColor.h
+    this.wheel.hueAngle = this.colors.base.modelColor.h
     this.buildColors();
     this.calculateWheel();
 
@@ -718,8 +647,9 @@ export default defineComponent({
       let newValue = (value.value == 'hslMode');
       if (newValue !== this.state.hslMode) {
         this.state.hslMode = newValue;
-        this.wheel.hueAngleHsl = this.colors.base.hslColor.h * 360
-        this.wheel.hueAngleHsv = this.colors.base.hsvColor.h
+        const rgb = ColorConverter.HexToRgb(this.colors.base.color);
+        this.colors.base.modelColor = ColorConverter.RgbToModel(rgb, this.state.hslMode);
+        this.wheel.hueAngle = this.colors.base.modelColor.h * 360;
         this.buildColors();
       }
     },
@@ -731,7 +661,7 @@ export default defineComponent({
       this.wheelDrag.time = new Date().getTime();
       this.wheelDrag.colorTime = this.wheelDrag.time;
       this.wheelDrag.splitAngle = this.wheel.splitAngle;
-      this.wheelDrag.hueAngle = this.state.hslMode ? this.wheel.hueAngleHsl : this.wheel.hueAngleHsv;
+      this.wheelDrag.hueAngle = this.wheel.hueAngle;
       window.addEventListener("mousemove", this.mouseMove);
       window.addEventListener("mouseup", this.mouseUp);
       window.addEventListener("blur", this.mouseUp);
@@ -757,7 +687,7 @@ export default defineComponent({
 
       const newAngle = this.calculateAngle(xD, yD);
       this.wheelDrag.newAngle = newAngle;
-      const hueAngle = this.state.hslMode ? this.wheel.hueAngleHsl : this.wheel.hueAngleHsv;
+      const hueAngle = this.wheel.hueAngle;
 
       switch (this.wheelDrag.colorName) {
 
@@ -777,9 +707,10 @@ export default defineComponent({
           this.wheelDrag.hueAngle = newAngle;
           break;
         case "alt":
-          this.altColors[this.state.selectedAltColor].hslColor.h = newAngle/360;
+          this.state.selectedAltColor = this.wheelDrag.hoveredAltColor;
+          this.altColors[this.state.selectedAltColor].modelColor.h = newAngle/360;
           this.altColors[this.state.selectedAltColor].color = ColorConverter.RGBtoString(
-            ColorConverter.HslToRgb(this.altColors[this.state.selectedAltColor].hslColor)
+            ColorConverter.ModelToRgb(this.altColors[this.state.selectedAltColor].modelColor, this.state.hslMode)
           );
           this.altWheel[this.state.selectedAltColor] = this.getWheelPos(newAngle, 0.75);
           break;
@@ -791,8 +722,7 @@ export default defineComponent({
       }
 
       if (time > this.wheelDrag.colorTime + this.wheelDrag.colorDebounce) {
-        this.colors.base.hslColor.h = this.wheel.hueAngleHsl / 360;
-        this.colors.base.hsvColor.h = this.wheel.hueAngleHsv;
+        this.colors.base.modelColor.h = this.wheel.hueAngle / 360;
         this.buildColors();
       }
       return false;
@@ -807,9 +737,10 @@ export default defineComponent({
       }
     },
     altMouseEnter(altKey: string) : void {
+      console.log()
       if (!this.wheelDrag.inDrag) {
         this.wheelDrag.colorName = "alt";
-        this.state.selectedAltColor = altKey;
+        this.wheelDrag.hoveredAltColor = altKey;
         this.state.selectedColorPath = "alt." + altKey;
       }
     },
@@ -830,10 +761,10 @@ export default defineComponent({
       }
       this.wheel.splitAngle = this.wheelDrag.splitAngle;
       if (this.state.hslMode) {
-        this.wheel.hueAngleHsl = this.wheelDrag.hueAngle;
+        this.wheel.hueAngle = this.wheelDrag.hueAngle;
       }
       else {
-        this.wheel.hueAngleHsv = this.wheelDrag.hueAngle;
+        this.wheel.hueAngle = this.wheelDrag.hueAngle;
       }
       this.calculateWheel();
     },
@@ -849,17 +780,12 @@ export default defineComponent({
         const canvasRect = (this.$refs["wheelInterface"] as HTMLElement).getBoundingClientRect();
         this.wheel.size = Math.floor(canvasRect.width);
         CanvasTool.init(this.$refs["canvasElement"] as HTMLCanvasElement, this.wheel.innerRadius, this.wheel.outerRadius, this.wheel.tileSize);
-        CanvasTool.drawImages(
-          (this.state.hslMode ? this.wheel.hsl.l : this.wheel.hsv.v),
-          (this.state.hslMode ? this.wheel.hsl.s : this.wheel.hsv.s),
-          this.state.hslMode
-        );
+        CanvasTool.drawImages(this.wheel.lOrV, this.wheel.s, this.state.hslMode);
         this.clearWheelTimeout();
       }, 100);
     },
     calculateWheel(): void {
-      const angle = this.state.hslMode ? this.wheel.hueAngleHsl : this.wheel.hueAngleHsv;
-      console.log(angle)
+      const angle = this.wheel.hueAngle;
       this.wheel.base = this.getWheelPos(angle, 0.97);
       this.wheel.comp = this.getWheelPos((angle + 180) % 360, 0.75);
       this.wheel.baseA = this.getWheelPos((angle + this.wheel.splitAngle) % 360, 0.75);
@@ -868,15 +794,24 @@ export default defineComponent({
       this.wheel.sideB = this.getWheelPos((angle + 360 - 90) % 360, 0.75);
       this.wheel.a = this.getWheelPos((angle + this.wheel.splitAngle + 180) % 360, 0.75);
       this.wheel.b = this.getWheelPos((angle - this.wheel.splitAngle + 180) % 360, 0.75);
-      console.log(JSON.stringify(this.wheel.base, null, '  '));
     },
     buildAltWheel(): void {
       Object.keys(this.altColors).forEach((key) => {
-        this.altWheel[key] = this.getWheelPos(this.altColors[key].hslColor.h * 360, 0.75);
+        this.altWheel[key] = this.getWheelPos(this.altColors[key].modelColor.h * 360, 0.75);
         this.altColors[key].color = ColorConverter.RGBtoString(
-          ColorConverter.HslToRgb(this.altColors[key].hslColor)
+          ColorConverter.ModelToRgb(this.altColors[key].modelColor, this.state.hslMode)
         );
       })
+    },
+    getOffsetModelColor(color: ModelColor, degrees: number): ModelColor {
+    let h = (color.h * 360 + degrees) % 360;
+    if (h < 0) {
+      h = 360 + h;
+    }
+    return {
+      h: h / 360,
+      s: color.s,
+      lOrV: color.lOrV } as ModelColor
     },
     buildColors(): void {
 
@@ -891,78 +826,52 @@ export default defineComponent({
         { prop: 'sideB', offset: 180 + 90 }
       ];
 
-      const hslColor = this.colors.base.hslColor;
+      const modelColor = this.colors.base.modelColor;
+      const lOrV = this.state.hslMode ? " l:" : " v:";
       for (const colorProp of colorProps) {
-        this.colors[colorProp.prop].hslColor = ColorConverter.GetHslOffsetColor(hslColor, (360 + colorProp.offset) % 360);
-        if (this.state.hslMode) {
-          this.colors[colorProp.prop].color = ColorConverter.RGBtoString(
-            ColorConverter.HslToRgb(this.colors[colorProp.prop].hslColor)
-          );
-          this.colors[colorProp.prop].label = "h:" + hslColor.h + " s:" + hslColor.s + " l:" + hslColor.l;
-        }
+        this.colors[colorProp.prop].modelColor = this.getOffsetModelColor(modelColor, (360 + colorProp.offset) % 360);
+        this.colors[colorProp.prop].color = ColorConverter.RGBtoString(
+          ColorConverter.ModelToRgb(this.colors[colorProp.prop].modelColor, this.state.hslMode)
+        );
+        this.colors[colorProp.prop].label = "h:" + modelColor.h + " s:" + modelColor.s + lOrV + modelColor.lOrV;
       }
 
-      const hsvColor = this.colors.base.hsvColor;
-      for (const colorProp of colorProps) {
-        this.colors[colorProp.prop].hsvColor = ColorConverter.GetHsvOffsetColor(
-        hsvColor, (360 + colorProp.offset) % 360);
-        if (!this.state.hslMode) {
-          this.colors[colorProp.prop].color = ColorConverter.RGBtoString(
-            ColorConverter.HsvToRgb(this.colors[colorProp.prop].hsvColor)
-          );
-          this.colors[colorProp.prop].label =
-            "h:" + Math.round(hsvColor.h) +
-            " s:" + (Math.round(hsvColor.s * 100) / 100) +
-            " v:" + (Math.round(hsvColor.v * 100) / 100);
-        }
-      }
+      this.wheel.hueAngle = this.colors.base.modelColor.h * 360;
 
-      this.wheel.hueAngleHsl = this.colors.base.hslColor.h * 360;
-      this.wheel.hueAngleHsv = this.colors.base.hslColor.h;
-      this.calculateWheel();
       Object.keys(this.colors).forEach(color => {
         let satChildren: Array<TemplateColor> = [];
         let lightChildren: Array<TemplateColor> = [];
+
+        const childColor = this.colors[color].modelColor;
 
         const satValues = [1, 0.84, 0.7, 0.63, 0.57, 0.5, 0.45, 0.37, 0.31, 0.22, 0.16, 0.1];
         const lValues = [0.92, 0.85, 0.78, 0.69, 0.64, 0.56, 0.48, 0.43, 0.35, 0.28, 0.18, 0.1];
         const vValues = [1, 0.85, 0.78, 0.69, 0.64, 0.56, 0.48, 0.43, 0.35, 0.28, 0.18, 0.01];
 
         satValues.forEach(sat => {
-          const childColorHsl = this.colors[color].hslColor;
-          const childColorHsv = this.colors[color].hsvColor;
-          const hslColor = { h: childColorHsl.h, s: sat, l: childColorHsl.l };
-          const hsvColor = { h: childColorHsl.h, s: sat, v: childColorHsv.v };
+          const modelColor = { h: childColor.h, s: sat, lOrV: childColor.lOrV };
           const child = {
             name: "Saturation: " + Math.round(sat * 100) / 100,
-            color: ColorConverter.RGBtoString(ColorConverter.HslToRgb(hslColor)),
-            hslColor: hslColor,
-            hsvColor: hsvColor,
+            color: ColorConverter.RGBtoString(
+              ColorConverter.ModelToRgb(modelColor, this.state.hslMode)
+            ),
+            modelColor: modelColor,
           } as TemplateColor;
           satChildren.push(child);
         });
 
-        lValues.forEach((lightness, index) => {
-          const value = vValues[index];
-          const childColorHsl = this.colors[color].hslColor;
-          const childColorHsv = this.colors[color].hsvColor;
-          const hslColor = { h: childColorHsl.h, s: childColorHsl.s, l: lightness };
-          const hsvColor = { h: childColorHsv.h, s: childColorHsv.s, v: value };
-          const rgbColor = (this.state.hslMode ?
-            ColorConverter.RGBtoString(ColorConverter.HslToRgb(hslColor)) :
-            ColorConverter.RGBtoString(ColorConverter.HsvToRgb(hsvColor))
-          ) as string;
+        const lOrV_Values = this.state.hslMode ? lValues : vValues;
 
-          const label = (this.state.hslMode ?
-            "Lightness: " + Math.round(lightness * 100) / 100 :
-            "Value: " + Math.round(value * 100) / 100
-          ) as string;
+        lOrV_Values.forEach(value => {
+          const childColor = this.colors[color].modelColor;
+          const modelColor = { h: childColor.h, s: childColor.s, lOrV: value };
+          const rgbColor = ColorConverter.RGBtoString(ColorConverter.ModelToRgb(modelColor, this.state.hslMode))
+          const label = lOrV + Math.round(value * 100) / 100
 
           const child = {
             name: label,
             color: rgbColor,
-            hslColor: hslColor,
-            hsvColor: hsvColor,
+            modelColor: modelColor,
           } as TemplateColor;
           lightChildren.push(child);
         });
@@ -982,37 +891,29 @@ export default defineComponent({
       } as XY
     },
     changeAlt(a: ChangeValue) {
-      const altColor = this.altColors[this.state.selectedAltColor].hslColor;
+      const altColor = this.altColors[this.state.selectedAltColor];
       switch (a.name) {
-        case 'altL':
-          altColor.l = a.value;
+        case 'altLorV':
+          altColor.modelColor.lOrV = a.value;
           break;
         case 'altS':
-          altColor.s = a.value;
+          altColor.modelColor.s = a.value;
           break;
       }
       this.altColors[this.state.selectedAltColor].color = ColorConverter.RGBtoString(
-        ColorConverter.HslToRgb(this.altColors[this.state.selectedAltColor].hslColor)
+        ColorConverter.ModelToRgb(this.altColors[this.state.selectedAltColor].modelColor, this.state.hslMode)
       );
-      CanvasTool.drawImages(altColor.l, altColor.s, this.state.hslMode);
+      CanvasTool.drawImages(altColor.modelColor.lOrV, altColor.modelColor.s, this.state.hslMode);
     },
     change(a: ChangeValue) {
       switch (a.name) {
-        case 'wheelL':
-          this.wheel.hsl.l = a.value;
-          CanvasTool.drawImages(this.wheel.hsl.l, this.wheel.hsl.s, this.state.hslMode);
-          break;
-        case 'wheelV':
-          this.wheel.hsv.v = a.value;
-          CanvasTool.drawImages(this.wheel.hsv.v, this.wheel.hsv.s, false);
+        case 'wheelLorV':
+          this.wheel.lOrV = a.value;
+          CanvasTool.drawImages(this.wheel.lOrV, this.wheel.s, this.state.hslMode);
           break;
         case 'wheelS':
-          this.wheel[this.state.hslMode ? 'hsl' : 'hsv'].s = a.value;
-          CanvasTool.drawImages(
-            (this.state.hslMode ? this.wheel.hsl.l : this.wheel.hsv.v),
-            (this.state.hslMode ? this.wheel.hsl : this.wheel.hsv).s,
-            this.state.hslMode
-          );
+          this.wheel.s = a.value;
+          CanvasTool.drawImages(this.wheel.lOrV, this.wheel.s, this.state.hslMode);
           break;
         case 'wheelSplitAngle': {
           this.wheel.splitAngle = a.value;
@@ -1020,8 +921,7 @@ export default defineComponent({
         }
       }
 
-      this.colors.base.hslColor = { h: this.wheel.hueAngleHsl / 360, s: this.wheel.hsl.s, l: this.wheel.hsl.l } as HslColor;
-      this.colors.base.hsvColor = { h: this.wheel.hueAngleHsv, s: this.wheel.hsv.s, v: this.wheel.hsv.v } as HsvColor;
+      this.colors.base.modelColor = { h: this.wheel.hueAngle / 360, s: this.wheel.s, lOrV: this.wheel.lOrV } as ModelColor;
 
       this.buildColors();
     },
@@ -1029,26 +929,23 @@ export default defineComponent({
       this.state.selectedColorPath = path.join('.');
       const templateMode = path[0] != 'altColor';
       if (templateMode) {
-        CanvasTool.drawImages(
-          this.state.hslMode ? this.wheel.hsl.l : this.wheel.hsv.v,
-          (this.state.hslMode ? this.wheel.hsl : this.wheel.hsv).s,
-          this.state.hslMode
-        )
+        this.state.selectedAltColor = path[1].toString();
+        const modelColor = ColorConverter.RgbToModel(
+          ColorConverter.HexToRgb(this.colors.base.color), this.state.hslMode);
+        CanvasTool.drawImages(modelColor.lOrV, modelColor.s, this.state.hslMode);
+        this.wheel.lOrV = modelColor.lOrV;
+        this.wheel.s = modelColor.s
       } else {
         this.state.selectedAltColor = path[1].toString();
-        const color = this.altColors[this.state.selectedAltColor];
-        CanvasTool.drawImages(
-          this.state.hslMode ? color.hslColor.l : color.hsvColor.v,
-          (this.state.hslMode ? color.hslColor : color.hsvColor).s,
-          this.state.hslMode);
+        const modelColor = ColorConverter.RgbToModel(
+          ColorConverter.HexToRgb(this.altColors[this.state.selectedAltColor].color), this.state.hslMode);
+        this.altColors[this.state.selectedAltColor].modelColor = modelColor;
+        CanvasTool.drawImages(modelColor.lOrV, modelColor.s, this.state.hslMode);
       }
       this.wheel.templateMode = templateMode;
     },
     isDark(color: TemplateColor) : boolean {
-      if (this.state.hslMode) {
-        return color.hslColor.l < 0.45
-      }
-      return color.hsvColor.v < 20;
+      return color.modelColor.lOrV < 0.45
     }
   }
 })

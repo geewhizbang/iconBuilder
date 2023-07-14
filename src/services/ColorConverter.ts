@@ -1,56 +1,18 @@
-import type { RgbColor, HslColor, HsvColor } from '@/types/global'
+import type { RgbColor, HslColor, HsvColor, ModelColor } from '@/types/global'
 
 class ColorConverterService {
-  HexToHSL(hex: string): HslColor {
+  HexToRgb(hex: string): RgbColor {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
 
     if (!result) {
       throw new Error('Could not parse Hex Color')
     }
 
-    const rHex = parseInt(result[1], 16)
-    const gHex = parseInt(result[2], 16)
-    const bHex = parseInt(result[3], 16)
-
-    const r = rHex / 255
-    const g = gHex / 255
-    const b = bHex / 255
-
-    const max = Math.max(r, g, b)
-    const min = Math.min(r, g, b)
-    const maxMin2 = (max + min) / 2
-    let h = maxMin2
-    let s = maxMin2
-    let l = maxMin2
-
-    if (max === min) {
-      // Achromatic
-      return { h: 0, s: 0, l }
+    return {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16),
     }
-
-    const d = max - min
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
-    switch (max) {
-      case r:
-        h = (g - b) / d + (g < b ? 6 : 0)
-        break
-      case g:
-        h = (b - r) / d + 2
-        break
-      case b:
-        h = (r - g) / d + 4
-        break
-    }
-    h /= 6
-
-    s = s * 100
-    s = Math.round(s)
-    l = l * 100
-    l = Math.round(l)
-    h = Math.round(360 * h)
-
-    const hsl = { h: h / 360, s: s / 100, l: l / 100 }
-    return hsl
   }
 
   #HueToRgb(p: number, q: number, t: number): number {
@@ -151,8 +113,18 @@ class ColorConverterService {
       h /= 6;
     }
   
-    return { h: h, s: s, v: v };
+    const hsv = { h: h, s: s, v: v };
+    return hsv;
   }  
+
+  RgbToModel(rgb: RgbColor, hslMode: boolean) : ModelColor {
+    if (hslMode) {
+      const hsl = this.RgbToHsl(rgb);
+      return {h: hsl.h, s: hsl.s, lOrV: hsl.l };
+    } 
+    const hsv = this.RgbToHsv(rgb);
+    return {h: hsv.h, s: hsv.s, lOrV: hsv.v };
+  }
 
   #ToRgbParam(x: number): string {
     const result = Math.round(x).toString(16).split('.')[0];
@@ -168,25 +140,10 @@ class ColorConverterService {
     return result.join('');
   }
 
-  GetHslOffsetColor(color: HslColor, degrees: number): HslColor {
-    let h = (color.h * 360 + degrees) % 360;
-    if (h < 0) {
-      h = 360 + h;
-    }
-    return { 
-      h: Math.round(h / 360 * 100) / 100,
-      s: Math.round(color.s * 100) / 100, 
-      l: Math.round(color.l * 100) / 100 } as HslColor;
-  }
-
-  GetHsvOffsetColor(color: HsvColor, degrees: number): HsvColor {
-    let h = (color.h + degrees) % 360;
-    if (h < 0) {
-      h = 360 + h;
-    }
-    return { h: Math.round(h),
-      s: Math.round(color.s * 100) / 100,
-      v: Math.round(color.v * 100) / 100 } as HsvColor;
+  ModelToRgb( color: ModelColor, isHsl: boolean) : RgbColor {
+    return isHsl ? 
+      this.HslToRgb( {h: color.h, s: color.s, l: color.lOrV }) :
+      this.HsvToRgb( {h: color.h, s: color.s, v: color.lOrV })
   }
 }
 
