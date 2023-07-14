@@ -24,9 +24,7 @@ export default {
 </script>
 
 <template>
-  <header>
-    <div class="appMenu" id="appMenu"></div>
-  </header>
+  <header id="header"></header>
   <RouterView />
   <div class="footer"></div>
 </template>

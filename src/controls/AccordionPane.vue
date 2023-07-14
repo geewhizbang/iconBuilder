@@ -37,7 +37,6 @@ export default defineComponent({
   },
   mounted() {
     setTimeout(() => {
-      console.log("registered child: " + this.panelName);
       const parentKey = AccordionService.registerChild(
         this.panelName,
         this.change,
@@ -48,7 +47,7 @@ export default defineComponent({
       } else {
         this.state.isReady = true;
       }
-    }, 10);
+    }, 50);
   },
   methods: {
     click(): void {

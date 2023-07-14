@@ -41,7 +41,7 @@ div {
     box-sizing: border-box;
     top: 0;
     left: 0;
-    padding: $paddingSmall;
+    padding: 0;
     width: 100%;
     height: $sizeHeaderHeight;
     background: $colorHeaderBg;
@@ -80,8 +80,8 @@ div {
   position: absolute;
   top: 0;
   left: 0;
-  width: $sizeModeBarWidth + (2 * $sizePadSmall);
-  padding: $sizePadSmall;
+  width: $sizeModeBarWidth + (2 * $sizeC);
+  padding: $sizeC;
   height: 100%;
   background: $colorBgMedium;
 
@@ -433,7 +433,7 @@ div {
 }
 
 #app .accordionControl {
-  padding: $sizePadSmall;
+  padding: $sizeC;
   height: 100%;
   width: 100%;
   
@@ -441,7 +441,7 @@ div {
     display: flex;
     justify-content: space-between;
     background: $colorBarBg;
-    padding: $sizePadMedium;
+    padding: $sizeD;
 
     &:hover {
       opacity: 0.7;
@@ -464,7 +464,7 @@ div {
     }  
     
     & + .accordionPane {
-      margin-top: $sizePadMedium;
+      margin-top: $sizeD;
     }
 
     &.disabled {
@@ -513,3 +513,104 @@ div {
 
   }
 }
+
+#app .stateSelector {
+  height: 100%;
+  width: 100%;
+  padding: $sizeB;
+  border-radius: $sizeD;
+  position: relative;
+
+  &::before {
+    content: '';
+    display: block;
+    border-radius: $sizeD;
+    background: white;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.4;
+    position: absolute;
+  }
+  
+  + .stateSelector {
+    margin-left: 10px;
+  }
+
+  label {
+    width: 100%;
+    height: 14px;
+    font-size: $sizeFontSmall;
+    line-height: 12px;
+    display: block;
+    position: absolute;
+    top: 2px;
+    left: $sizeD;
+  }
+
+  .selectorButtons {
+    display: flex;
+    height: 20px;
+    flex-direction: row;
+    position: absolute;
+    top: 16px;
+    left: $sizeD;
+    bottom: 0;
+    right: $sizeD;
+    
+    .button {
+      height: 100%;
+      flex-grow: 1;
+      position: relative;
+      display: block;
+      padding: $sizeA;
+      margin: 0;
+      box-sizing: border-box;
+      outline: none;
+      border: none;
+      border-radius: $sizeButtonRadius;
+      background: $colorButtonBg;
+
+      &:hover {
+        background: $colorButtonBgHover;
+      }
+      
+      &.selected {
+        background: $colorButtonBgSelected;
+
+        &::before {
+          background: $colorIndicatorSelected;
+          border-color: $colorIndicatorBorderSelected;
+        }
+      }
+      + .button {
+        margin-left: $sizeC;
+      }
+
+      &::before {
+        content: '';
+        width: $sizeFontBase * 0.6;
+        height: $sizeFontBase * 0.6;
+        border-radius: $sizeFontBase * 0.3;
+        border: 1px solid $colorGrayMedium;
+        background: $colorGrayMediumLight;
+        display: block;
+        position: absolute;
+        top: $sizeC;
+        left: $sizeD;
+      }
+
+      > span {
+        display: block;
+        position: absolute;
+        top: -3px;
+        font-size: $sizeFontSmall;
+        left: $sizeFontBase * 1.8;
+        line-height: $sizeFontBase * 1.9
+      }
+    }
+  }
+}
+
+

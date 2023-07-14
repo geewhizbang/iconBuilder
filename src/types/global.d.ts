@@ -1,13 +1,3 @@
-declare global {
-  type JSONPrimitive = string | number | boolean | null
-  type JSONValue = JSONPrimitive | JSONObject | JSONArray
-  type JSONObject = { [member: string]: JSONValue }
-
-  //example of custom interface
-  interface JSONArray extends Array<JSONValue> {}
-
-}
-
 export interface ScrollElement {
   width: number;
   height: number;
@@ -57,6 +47,13 @@ export type HslColorKeys = | 'h' | 's' | 'l';
 export type HslColor = { 
   [key in HslColorKeys]: number;
 }
+
+export type HsvColorKeys = | 'h' | 's' | 'v';
+
+export type HsvColor = { 
+  [key in HsvColorKeys]: number;
+}
+
 export type RgbColorKeys = | 'r' | 'g' | 'b';
 
 export type RgbColor = {

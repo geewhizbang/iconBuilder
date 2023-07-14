@@ -1,4 +1,4 @@
-import type { HslColor } from "@/types/global";
+import type { HslColor, RgbColor, HsvColor } from "@/types/global";
 import { ColorConverter } from "./ColorConverter";
 
 interface CanvasToolImage {
@@ -16,8 +16,6 @@ interface CanvasData {
   tileSize: number,
   innerRadius: number,
   outerRadius: number,
-  l: number,
-  s: number,
   centerX: number,
   centerY: number,
   rendering: Boolean,
@@ -33,10 +31,8 @@ class CanvasToolService {
     height: 400,
     images: [],
     tileSize: 50,
-    innerRadius: 140,
-    outerRadius: 199,
-    l: 0.6,
-    s: 0.7,
+    innerRadius: 153,
+    outerRadius: 192,
     centerX: 200,
     centerY: 200,
     rendering: false,
@@ -110,13 +106,13 @@ class CanvasToolService {
     }
   }
 
-	drawImages(l: number, s: number) : void {
+	drawImages(lOrV: number, s: number, hslMode: boolean) : void {
 
     if (this.#data.rendering) {
       if (this.#data.renderTimeout != null) {
         clearTimeout(this.#data.renderTimeout);
         this.#data.renderTimeout = setTimeout(() => {
-          this.drawImages(l,s);
+          this.drawImages(lOrV,s, hslMode);
         }, 2000);
       }
       return;
@@ -128,9 +124,6 @@ class CanvasToolService {
       this.#clearImages();
       this.#buildImages();
       
-      this.#data.s = s;
-      this.#data.l = l;
-
       for (let q = 0; q < this.#data.images.length; q++) {
       
         const image = this.#data.images[q];
@@ -144,8 +137,17 @@ class CanvasToolService {
             if (radius < this.#data.outerRadius && radius > this.#data.innerRadius) {
               const angle = Math.atan2(yD, xD);
             
-              const hslColor = { h: angle / Math.PI / 2, s: this.#data.s, l: this.#data.l } as HslColor
-              const color = ColorConverter.HslToRgb(hslColor);
+              let color = {} as RgbColor;
+
+              if (hslMode) {
+                const hslColor = { h: angle / Math.PI / 2, s: s, l: lOrV } as HslColor
+                color = ColorConverter.HslToRgb(hslColor);
+              } else { 
+                const hsvColor = { h: ((angle / Math.PI * 180) + 360) % 360, s: s, v: lOrV } as HsvColor
+                // console.log("angle:" + (Math.round(angle * 100) / 100) + "h:" + hsvColor.h);
+                color = ColorConverter.HsvToRgb(hsvColor);
+                // console.log(JSON.stringify({hsvColor: hsvColor, color: color}, null, '  '))
+              }
               const index = y * 4 * this.#data.tileSize + x * 4;
               const imageData = image.image;
               imageData.data[index] = color.r;

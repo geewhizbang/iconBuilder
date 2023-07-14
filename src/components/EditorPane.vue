@@ -177,14 +177,14 @@ export default defineComponent({
     position: absolute;
     top: 0;
     right: 0;
-    left: $sizeRulerBarWidth + $sizeModeBarWidth + 2 * $sizePadSmall;
+    left: $sizeRulerBarWidth + $sizeModeBarWidth + 2 * $sizeC;
     height: $sizeRulerBarWidth;
   }
 
   .rulerVert {
     position: absolute;
     top: $sizeRulerBarWidth;
-    left: $sizeModeBarWidth + 2 * $sizePadSmall;
+    left: $sizeModeBarWidth + 2 * $sizeC;
     bottom: 0;
     width: $sizeRulerBarWidth;
   }
@@ -192,7 +192,7 @@ export default defineComponent({
   .rulerCorner {
     position: absolute;
     top: 0;
-    left: $sizeModeBarWidth + 2 * $sizePadSmall;
+    left: $sizeModeBarWidth + 2 * $sizeC;
     width: $sizeRulerBarWidth;
     height: $sizeRulerBarWidth;
     background: $colorRulerBg;
@@ -201,7 +201,7 @@ export default defineComponent({
   .scrollPane {
     position: absolute;
     top: $sizeRulerBarWidth;
-    left: $sizeModeBarWidth + 2 * $sizePadSmall + $sizeRulerBarWidth;
+    left: $sizeModeBarWidth + 2 * $sizeC + $sizeRulerBarWidth;
     bottom: 0;
     right: 0;
     overflow: hidden;
