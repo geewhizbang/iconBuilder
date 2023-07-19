@@ -658,6 +658,11 @@ export default defineComponent({
       }
     },
     editModeChange(value: ModeChange) {
+      const altKeys = Object.keys(this.altColors);
+      if (this.state.selectedAltColor == "") {
+        this.state.selectedAltColor = altKeys[0];
+        this.state.selectedColorPath = 'altColor.' + altKeys[0];
+      }
       this.wheel.templateMode = (value.value == 'template');
     },
     mouseDown(): Boolean {
@@ -1103,7 +1108,7 @@ $wheelPad: 1.4vw;
       }
 
       &.selected {
-        border: 1px solid $colorGrayDark;
+        border: 2px solid $colorGrayDark;
       }
 
       &:hover {
