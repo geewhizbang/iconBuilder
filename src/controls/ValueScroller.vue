@@ -30,7 +30,6 @@
       ></div>
     </div>
   </div>
-  <!-- <textarea v-if="label == 'Darker / Lighter'" class="debug" v-model="getState"></textarea> -->
 </template>
 
 <script lang="ts">
@@ -39,25 +38,27 @@ import { StyleValue, defineComponent, ref } from "vue";
 export default defineComponent({
   name: "ScrollBar",
   emits: ["change"],
-  setup() {
+  setup(props) {
+    const state = ref({
+      currentValue: props.modelValue,
+      startY: -1,
+      startX: -1,
+      inDrag: false,
+      minPosition: 0,
+      maxPosition: 100,
+      clickedPosition: 0,
+      newPosition: 0,
+      time: -1,
+      timer: -1,
+      elementRect: new DOMRect(),
+      upButtonRect: new DOMRect(),
+      downButtonRect: new DOMRect(),
+      buttonRect: new DOMRect(),
+      min: props.minMax.min,
+      max: props.minMax.max,
+    });
     return {
-      state: ref({
-        scrollPosition: 0,
-        currentValue: 0,
-        startY: -1,
-        startX: -1,
-        inDrag: false,
-        minPosition: 0,
-        maxPosition: 100,
-        clickedPosition: 0,
-        newPosition: 0,
-        time: -1,
-        timer: -1,
-        elementRect: new DOMRect(),
-        upButtonRect: new DOMRect(),
-        downButtonRect: new DOMRect(),
-        buttonRect: new DOMRect(),
-      }),
+      state: state,
     };
   },
   props: {
@@ -65,20 +66,16 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
-    minValue: {
-      type: Number,
-      default: 0,
-    },
-    maxValue: {
-      type: Number,
-      default: 100,
-    },
     hasUpDownButtons: {
       type: Boolean,
       default: false,
     },
     modelValue: {
       type: Number,
+      required: true,
+    },
+    minMax: {
+      type: Object,
       required: true,
     },
     name: {
@@ -103,18 +100,22 @@ export default defineComponent({
     },
   },
   watch: {
-    modelValue: function (newVal: number, oldVal: number) {
-      if (newVal != oldVal) {
-        this.init();
-      }
+    minMax(newVal) {
+      this.state.min = newVal.min;
+      this.state.max = newVal.max;
+      this.init();
+    },
+    modelValue(newVal) {
+      this.state.currentValue = newVal;
+      this.init();
     },
   },
-  mounted() {
+  mounted(): void {
     this.init();
   },
   computed: {
     getButtonStyle(): StyleValue {
-      const value = this.state.scrollPosition + "px";
+      const value = this.getScrollPosition() + "px";
       return this.isVert
         ? {
             top: value,
@@ -122,14 +123,6 @@ export default defineComponent({
         : ({
             left: value,
           } as StyleValue);
-    },
-    getState(): string {
-      return (
-        "state = " +
-        JSON.stringify(this.state, null, "  ") +
-        "\n\nprops=" +
-        JSON.stringify(this.$props, null, "  ")
-      );
     },
   },
   methods: {
@@ -144,10 +137,6 @@ export default defineComponent({
       this.state.maxPosition =
         this.getHeight(this.getRect("element")) - this.getHeight(this.state.buttonRect);
       this.state.minPosition = 0;
-      this.state.currentValue = this.modelValue;
-      this.state.scrollPosition =
-        ((this.modelValue - this.minValue) / (this.maxValue - this.minValue)) *
-        (this.state.maxPosition - this.state.minPosition);
     },
     getHeight(x: DOMRect): number {
       return this.isVert ? x.height : x.width;
@@ -176,7 +165,7 @@ export default defineComponent({
       }
     },
     getValue(): number {
-      const round = this.maxValue < 100 ? 10 : 1;
+      const round = this.state.max < 100 ? 10 : 1;
       return Math.round(this.modelValue * round) / round;
     },
     mouseDown(): Boolean {
@@ -187,11 +176,17 @@ export default defineComponent({
       return false;
     },
     scrollClick(up: Boolean) {
-      this.state.scrollPosition += up ? -1 : 1;
+      this.state.newPosition += ((up ? 1 : -1) * (this.state.max - this.state.min)) / 100;
       this.moveMouse();
     },
     getScrollLength(): number {
       return this.isVert ? this.state.elementRect.height : this.state.elementRect.width;
+    },
+    getScrollPosition(): number {
+      return (
+        ((this.state.currentValue - this.state.min) / (this.state.max - this.state.min)) *
+        (this.state.maxPosition - this.state.minPosition)
+      );
     },
     moveMouse(): void {
       this.state.time = new Date().getTime();
@@ -199,14 +194,14 @@ export default defineComponent({
         window.clearTimeout(this.state.timer);
         this.state.timer = -1;
       }
-      this.state.scrollPosition = this.state.newPosition;
-      let newValue =
-        ((this.state.scrollPosition - this.state.minPosition) /
-          (this.state.maxPosition - this.state.minPosition)) *
-          (this.maxValue - this.minValue) +
-        this.minValue;
 
-      newValue = Math.min(this.maxValue, Math.max(newValue, this.minValue));
+      let newValue =
+        ((this.state.newPosition - this.state.minPosition) /
+          (this.state.maxPosition - this.state.minPosition)) *
+          (this.state.max - this.state.min) +
+        this.state.min;
+
+      newValue = Math.min(this.state.max, Math.max(newValue, this.state.min));
 
       if (newValue != this.state.currentValue) {
         this.$emit("change", { value: newValue, name: this.name });
@@ -217,7 +212,7 @@ export default defineComponent({
       if (this.state.startY == -1) {
         this.state.startY = this.getClientY(event);
         this.state.startX = this.getClientX(event);
-        this.state.clickedPosition = this.state.scrollPosition;
+        this.state.clickedPosition = this.getScrollPosition();
         this.state.newPosition = this.state.clickedPosition;
       } else {
         let buttonPosition =

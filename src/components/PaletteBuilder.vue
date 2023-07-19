@@ -1,9 +1,9 @@
 <template>
-  <div class="paletteBuilder">
+  <div class="paletteBuilder" v-if="state.ready">
     <div class="templateColors" role="list">
       <div class="templateGroup">
         <h2>Template Colors</h2>
-        <div v-for="(color, key) in colors" :key="key" class="colorGroup">
+        <div v-for="(color, key) in colors" :key="key + color.color" class="colorGroup">
           <div class="parent">
             <div
               class="colorSwatch"
@@ -12,12 +12,10 @@
               :class="{ selected: 'template.' + key == state.selectedColorPath }"
               v-on:click="selectColor(['template', key])"
             >
-              <div
-                :style="{ background: color.color }"
-                class="centerLabel"
-                :class="{ white: isDark(color) }"
-              >
-                <label class="label"> {{ color.name }}<br /> </label>
+              <div :style="{ background: color.color }" class="centerLabel">
+                <label class="label" :class="{ white: isDark(color.color) }">
+                  {{ color.name }}
+                </label>
                 <label class="hoverLabel">
                   {{ color.label }}
                 </label>
@@ -83,7 +81,7 @@
               v-on:click="selectColor(['altColor', key])"
             >
               <div class="centerLabel">
-                <label class="label" :class="{ white: color.modelColor.lOrV < 0.45 }">
+                <label class="label" :class="{ white: isDark(color.color) }">
                   {{ color.name }}<br />
                 </label>
                 <label class="hoverLabel">
@@ -322,43 +320,42 @@
             <div class="wheelAdjust" v-if="wheel.templateMode">
               <ValueScroller
                 :model-value="wheel.s"
-                :minValue="0.2"
-                :maxValue="0.95"
+                :minMax="{ min: 0.2, max: 0.95 }"
                 label="Saturation"
                 v-on:change="change"
                 name="wheelS"
                 :showValue="true"
                 :useVw="true"
-                aria-label="Saturation"
               />
               <ValueScroller
                 :model-value="wheel.lOrV"
-                :minValue="0.2"
-                :maxValue="0.85"
+                :minMax="{
+                  min: state.hslMode ? 0.2 : 0.1,
+                  max: state.hslMode ? 0.85 : 1,
+                }"
                 :label="state.hslMode ? 'Lightness' : 'Value'"
                 v-on:change="change"
                 name="wheelLorV"
                 :showValue="true"
                 :useVw="true"
-                :aria-label="state.hslMode ? 'Lightness' : 'Value'"
               />
               <ValueScroller
                 :model-value="wheel.splitAngle"
-                :minValue="wheel.minSplit"
-                :maxValue="wheel.maxSplit"
+                :minMax="{ min: wheel.minSplit, max: wheel.maxSplit }"
                 label="Split Angle"
                 v-on:change="change"
                 name="wheelSplitAngle"
                 :showValue="true"
                 :useVw="true"
-                aria-label="Split Angle"
               />
             </div>
             <div class="wheelAdjust" v-if="!wheel.templateMode">
               <ValueScroller
                 :model-value="altColors[state.selectedAltColor].modelColor.s"
-                :minValue="0.2"
-                :maxValue="0.95"
+                :minMax="{
+                  min: 0.2,
+                  max: state.hslMode ? 0.95 : 1,
+                }"
                 label="Saturation"
                 v-on:change="changeAlt"
                 name="altS"
@@ -367,9 +364,12 @@
                 aria-label="Saturation"
               />
               <ValueScroller
+                :key="'lOrv' + state.hslMode"
                 :model-value="altColors[state.selectedAltColor].modelColor.lOrV"
-                :minValue="0.2"
-                :maxValue="0.85"
+                :minMax="{
+                  min: state.hslMode ? 0.2 : 0.1,
+                  max: state.hslMode ? 0.85 : 1,
+                }"
                 :label="state.hslMode ? 'Lightness' : 'Value'"
                 v-on:change="changeAlt"
                 name="altLorV"
@@ -403,8 +403,8 @@
     </div>
     <HeaderControl>
       <template v-slot:onLeft>
-        <p>{{ wheelDrag.hoveredAltColor }}</p>
-        <p>{{ JSON.stringify(altColors, null, "  ") }}</p>
+        <p>{{ luminance(colors.baseA.color) }}</p>
+        <p>{{ luminance(colors.sideA.color) }}</p>
       </template>
       <template v-slot:onRight>
         <div class="stateButtons">
@@ -501,7 +501,9 @@ export default defineComponent({
 
   setup() {
 
-    const baseColorModel = ColorConverter.RgbToModel({ r: 33, g: 212, b: 235 } as RgbColor, true);
+    const hslMode = false;
+    const baseColorModel = ColorConverter.RgbToModel({ r: 33, g: 212, b: 235 } as RgbColor, hslMode);
+
 
     const redColor = { r: 255, g: 0, b: 0 };
 
@@ -509,7 +511,7 @@ export default defineComponent({
       red: {
         name: 'Warning Color',
         label: "",
-        modelColor: ColorConverter.RgbToModel(redColor, true),
+        modelColor: ColorConverter.RgbToModel(redColor, hslMode),
         color: ColorConverter.RGBtoString(redColor),
       },
     }
@@ -520,9 +522,9 @@ export default defineComponent({
       baseA: 'Split A',
       base: 'Base Color',
       baseB:'Split B',
-      compA: 'Comp Split A',
+      compA: 'Complimentary Split\xa0A',
       comp: 'Complimentary',
-      compB: 'Comp Split B',
+      compB: 'Complimentary Split\xa0B',
       sideA: 'Side A',
       sideB: 'Side B'
     };
@@ -548,8 +550,8 @@ export default defineComponent({
       timeout: null,
       splitAngle: 20,
       hueAngle: baseColorModel.h * 360,
-      lOrV: 0.5,
-      s: 0.5,
+      lOrV: baseColorModel.lOrV,
+      s: baseColorModel.s,
       innerRadius: 0.748,
       outerRadius: 0.975,
       tileSize: 20,
@@ -584,12 +586,12 @@ export default defineComponent({
     const colorState: StateSelectorData = {
       disabled: false,
       states: {
+        hsvMode: {
+          label: "HSV Mode",
+        },
         hslMode: {
           label: "HSL Mode",
         },
-        hsvMode: {
-          label: "HSV Mode",
-        }
       }
     }
 
@@ -613,7 +615,8 @@ export default defineComponent({
       state: ref({
         selectedColorPath: '',
         selectedAltColor: '',
-        hslMode: true,
+        hslMode: hslMode,
+        ready: false,
       }),
       wheelDrag: ref(wheelDrag),
       colors: ref(colors),
@@ -633,6 +636,7 @@ export default defineComponent({
   mounted() {
     this.wheel.hueAngle = this.colors.base.modelColor.h
     this.buildColors();
+    this.state.ready = true;
     this.calculateWheel();
 
     this.buildAltWheel();
@@ -737,7 +741,6 @@ export default defineComponent({
       }
     },
     altMouseEnter(altKey: string) : void {
-      console.log()
       if (!this.wheelDrag.inDrag) {
         this.wheelDrag.colorName = "alt";
         this.wheelDrag.hoveredAltColor = altKey;
@@ -804,14 +807,19 @@ export default defineComponent({
       })
     },
     getOffsetModelColor(color: ModelColor, degrees: number): ModelColor {
-    let h = (color.h * 360 + degrees) % 360;
-    if (h < 0) {
-      h = 360 + h;
-    }
-    return {
-      h: h / 360,
-      s: color.s,
-      lOrV: color.lOrV } as ModelColor
+      let h = (color.h * 360 + degrees) % 360;
+      if (h < 0) {
+        h = 360 + h;
+      }
+      return {
+        h: h / 360,
+        s: color.s,
+        lOrV: color.lOrV } as ModelColor
+    },
+    buildLabel(modelColor: ModelColor) : string {
+      return "h:" + (Math.round(modelColor.h * 100) / 100) +
+        " s:" + (Math.round(modelColor.s * 100) / 100) +
+        (this.state.hslMode ? " l:" : " v:") + (Math.round(modelColor.lOrV * 100) / 100);
     },
     buildColors(): void {
 
@@ -827,13 +835,13 @@ export default defineComponent({
       ];
 
       const modelColor = this.colors.base.modelColor;
-      const lOrV = this.state.hslMode ? " l:" : " v:";
+      const lOrV = this.state.hslMode ? " Lightness:" : " Value:";
       for (const colorProp of colorProps) {
         this.colors[colorProp.prop].modelColor = this.getOffsetModelColor(modelColor, (360 + colorProp.offset) % 360);
         this.colors[colorProp.prop].color = ColorConverter.RGBtoString(
           ColorConverter.ModelToRgb(this.colors[colorProp.prop].modelColor, this.state.hslMode)
         );
-        this.colors[colorProp.prop].label = "h:" + modelColor.h + " s:" + modelColor.s + lOrV + modelColor.lOrV;
+        this.colors[colorProp.prop].label = this.buildLabel(this.colors[colorProp.prop].modelColor);
       }
 
       this.wheel.hueAngle = this.colors.base.modelColor.h * 360;
@@ -944,8 +952,15 @@ export default defineComponent({
       }
       this.wheel.templateMode = templateMode;
     },
-    isDark(color: TemplateColor) : boolean {
-      return color.modelColor.lOrV < 0.45
+    luminance(color: string) : number {
+      return ColorConverter.luminance(ColorConverter.HexToRgb(color));
+    },
+    isDark(color: string) : boolean {
+      if (color !== "") {
+        const luminance = this.luminance(color);
+        return luminance < 0.3;
+      }
+      return false;
     }
   }
 })
@@ -1006,8 +1021,10 @@ $wheelPad: 1.4vw;
     .label {
       display: block;
       box-sizing: border-box;
-      height: $medPad;
-      line-height: $vwFontBase;
+      width: 100%;
+      height: auto;
+      overflow: hidden;
+      line-height: $vwFontBase * 1.2;
       font-size: 0.86 * $vwFontBase;
       text-align: center;
       font-weight: 700;
@@ -1050,7 +1067,7 @@ $wheelPad: 1.4vw;
         left: calc(50% - 0.2vw);
         width: 0.4vw;
         height: 0.4vw;
-        top: -0.3vw;
+        top: -0.5vw;
         background: $colorGrayDark;
         transform: rotate(45deg);
         opacity: 0;
@@ -1059,11 +1076,14 @@ $wheelPad: 1.4vw;
 
       .hoverLabel {
         position: absolute;
-        top: -1vw;
+        top: -1.2vw;
+        left: 0;
+        right: 0;
+        text-align: center;
         height: auto;
         border-radius: 0.2vw;
-        line-height: 0.3 * $vwFontBase;
-        padding: 0.35vw 0.5vw;
+        line-height: 0.35 * $vwFontBase;
+        padding: 0.35vw 0.2vw;
         background: $colorGrayDark;
         color: white;
         opacity: 0;
