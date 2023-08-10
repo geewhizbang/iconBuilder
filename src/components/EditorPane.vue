@@ -63,7 +63,7 @@ export default defineComponent({
     ScrollBar,
     DrawPane,
   },
-  data() {
+  setup() {
     const scrollData = ref<ScrollData>({
       scrollArea: {
         width: 5000,
